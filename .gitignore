@@ -1,0 +1,43 @@
+# Database
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
+# Logs
+*.log
+logs/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Environment
+.env
+.env.local
+venv/
+env/
+
+# Backups and old files
+*.backup
+*.backup_*
+*.old
+*_old.*
+*.bak
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+
+# CDN uploads (if any)
+uploads/
+cdn_cache/
+
+# Test files
+test_*.py
+*_test.py

@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ClankerVids - Robot Fails, AI Highlights & Epic Bot Moments</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Watch the best robot fails, AI highlights, and epic bot moments. ClankerVids curates viral robot content - Boston Dynamics, BattleBots, shitty robots, and more. Updated daily.">
+    <meta name="keywords" content="robot fails, robot videos, AI highlights, Boston Dynamics, BattleBots, robot compilation, funny robots, robot accidents, automation fails, tech fails">
+    <meta name="author" content="ClankerVids">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://clankervids.com/">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://clankervids.com/">
+    <meta property="og:title" content="ClankerVids - Robot Fails & AI Highlights">
+    <meta property="og:description" content="Watch the best robot fails, AI highlights, and epic bot moments. Updated daily with viral robot content.">
+    <meta property="og:image" content="https://clankervids-cdn.b-cdn.net/assets/clankervids_logo.png">
+    <meta property="og:site_name" content="ClankerVids">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://clankervids.com/">
+    <meta name="twitter:title" content="ClankerVids - Robot Fails & AI Highlights">
+    <meta name="twitter:description" content="Watch the best robot fails, AI highlights, and epic bot moments. Updated daily.">
+    <meta name="twitter:image" content="https://clankervids-cdn.b-cdn.net/assets/clankervids_logo.png">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "ClankerVids",
+      "url": "https://clankervids.com",
+      "description": "Watch the best robot fails, AI highlights, and epic bot moments",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://clankervids.com/?search={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+    
+    <link rel="icon" type="image/png" href="https://clankervids-cdn.b-cdn.net/assets/clankervids_logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --neon: #39FF14;
+            --neon-dim: #2abd0f;
+            --bg-dark: #0f0f0f;
+            --bg-card: #1a1a1a;
+            --bg-hover: #272727;
+            --text: #fff;
+            --text-dim: #aaa;
+            --text-muted: #717171;
+        }
+
+        html, body {
+            min-height: 100%;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+        }
+
+        /* ============================================
+           HEADER - Shared
+           ============================================ */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 56px;
+            background: var(--bg-dark);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--neon) 0%, #00ff88 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-icon {
+            font-size: 24px;
+            -webkit-text-fill-color: initial;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .header-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .header-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* Desktop Search */
+        .search-box {
+            display: none;
+            background: var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 40px;
+            padding: 8px 16px;
+            width: 400px;
+            max-width: 40vw;
+        }
+
+        .search-box input {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 14px;
+            width: 100%;
+            outline: none;
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* ============================================
+           CATEGORIES - Shared
+           ============================================ */
+        .categories {
+            position: fixed;
+            top: 56px;
+            left: 0;
+            right: 0;
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            z-index: 99;
+            background: var(--bg-dark);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .categories::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-pill {
+            flex-shrink: 0;
+            padding: 8px 14px;
+            border-radius: 8px;
+            background: var(--bg-card);
+            border: none;
+            color: white;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .category-pill.active {
+            background: white;
+            color: black;
+        }
+
+        .category-pill:hover:not(.active) {
+            background: var(--bg-hover);
+        }
+
+        .sort-divider {
+            color: rgba(255,255,255,0.2);
+            padding: 0 4px;
+            display: flex;
+            align-items: center;
+        }
+
+        .sort-pill {
+            background: rgba(57, 255, 20, 0.1);
+            color: var(--neon);
+        }
+
+        .sort-pill.active {
+            background: var(--neon);
+            color: black;
+        }
+
+        /* ============================================
+           MOBILE STYLES - TikTok Feed
+           ============================================ */
+        @media (max-width: 899px) {
+            body {
+                overflow: hidden;
+            }
+
+            .header {
+                background: linear-gradient(180deg, rgba(15,15,15,0.95) 0%, rgba(15,15,15,0) 100%);
+                border-bottom: none;
+            }
+
+            .categories {
+                background: transparent;
+                border-bottom: none;
+            }
+
+            .desktop-grid {
+                display: none !important;
+            }
+
+            .mobile-feed {
+                display: block;
+                height: 100vh;
+                overflow-y: scroll;
+                scroll-snap-type: y mandatory;
+                scrollbar-width: none;
+            }
+
+            .mobile-feed::-webkit-scrollbar {
+                display: none;
+            }
+
+            .video-card-mobile {
+                height: 100vh;
+                width: 100%;
+                scroll-snap-align: start;
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: black;
+            }
+
+            .video-wrapper-mobile {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                max-width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .thumbnail-mobile {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                position: absolute;
+                top: 0;
+                left: 0;
+            }
+
+            .play-icon-mobile {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 70px;
+                height: 70px;
+                background: rgba(0,0,0,0.6);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                z-index: 5;
+            }
+
+            .play-icon-mobile::after {
+                content: '';
+                width: 0;
+                height: 0;
+                border-style: solid;
+                border-width: 12px 0 12px 20px;
+                border-color: transparent transparent transparent white;
+                margin-left: 4px;
+            }
+
+            .video-info-mobile {
+                position: absolute;
+                bottom: 100px;
+                left: 12px;
+                right: 70px;
+                z-index: 10;
+            }
+
+            .video-creator-mobile {
+                font-size: 15px;
+                font-weight: 600;
+                margin-bottom: 6px;
+            }
+
+            .video-title-mobile {
+                font-size: 13px;
+                line-height: 1.4;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                opacity: 0.9;
+            }
+
+            .video-tags-mobile {
+                display: flex;
+                gap: 8px;
+                margin-top: 8px;
+                font-size: 12px;
+                color: var(--text-dim);
+            }
+
+            .action-buttons-mobile {
+                position: absolute;
+                right: 8px;
+                bottom: 120px;
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+                z-index: 10;
+            }
+
+            .action-btn-mobile {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 4px;
+                cursor: pointer;
+            }
+
+            .action-icon-mobile {
+                width: 44px;
+                height: 44px;
+                background: rgba(255,255,255,0.1);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 20px;
+            }
+
+            .action-btn-mobile.liked .action-icon-mobile {
+                background: var(--neon);
+            }
+
+            .action-count-mobile {
+                font-size: 11px;
+                color: white;
+            }
+
+            /* Bottom Nav - Mobile Only */
+            .bottom-nav {
+                display: flex;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 56px;
+                background: rgba(0,0,0,0.95);
+                justify-content: space-around;
+                align-items: center;
+                border-top: 1px solid rgba(255,255,255,0.1);
+                z-index: 100;
+            }
+
+            .nav-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 2px;
+                color: var(--text-dim);
+                cursor: pointer;
+                font-size: 10px;
+            }
+
+            .nav-item.active {
+                color: white;
+            }
+
+            .nav-icon {
+                font-size: 22px;
+            }
+        }
+
+        /* ============================================
+           DESKTOP STYLES - YouTube Grid
+           ============================================ */
+        @media (min-width: 900px) {
+            body {
+                overflow-y: auto;
+            }
+
+            .header {
+                padding: 0 24px;
+            }
+
+            .logo {
+                font-size: 22px;
+            }
+
+            .search-box {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .categories {
+                padding: 12px 24px;
+            }
+
+            .mobile-feed {
+                display: none !important;
+            }
+
+            .bottom-nav {
+                display: none !important;
+            }
+
+            .desktop-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 16px;
+                padding: 130px 24px 40px;
+                max-width: 1800px;
+                margin: 0 auto;
+            }
+
+            .video-card-desktop {
+                cursor: pointer;
+                transition: transform 0.2s;
+            }
+
+            .video-card-desktop:hover {
+                transform: scale(1.02);
+            }
+
+            .video-card-desktop:hover .thumbnail-desktop {
+                border-radius: 8px;
+            }
+
+            .thumbnail-container {
+                position: relative;
+                width: 100%;
+                padding-top: 56.25%; /* 16:9 */
+                background: var(--bg-card);
+                border-radius: 12px;
+                overflow: hidden;
+            }
+
+            .thumbnail-desktop {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: border-radius 0.2s;
+            }
+
+            .duration-badge {
+                position: absolute;
+                bottom: 8px;
+                right: 8px;
+                background: rgba(0,0,0,0.8);
+                padding: 2px 6px;
+                border-radius: 4px;
+                font-size: 12px;
+                font-weight: 500;
+            }
+
+            .category-badge {
+                position: absolute;
+                top: 8px;
+                left: 8px;
+                background: var(--neon);
+                color: black;
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 11px;
+                font-weight: 600;
+                text-transform: uppercase;
+            }
+
+            .video-details {
+                padding: 12px 4px;
+                display: flex;
+                gap: 12px;
+            }
+
+            .channel-avatar {
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                background: var(--bg-card);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 16px;
+                flex-shrink: 0;
+            }
+
+            .video-meta {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .video-title-desktop {
+                font-size: 14px;
+                font-weight: 500;
+                line-height: 1.4;
+                margin-bottom: 6px;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            .video-creator-desktop {
+                font-size: 13px;
+                color: var(--text-dim);
+                margin-bottom: 2px;
+            }
+
+            .video-creator-desktop:hover {
+                color: white;
+            }
+
+            .video-stats {
+                font-size: 13px;
+                color: var(--text-muted);
+            }
+
+            .video-stats span {
+                margin-right: 4px;
+            }
+        }
+
+        /* Large Desktop */
+        @media (min-width: 1400px) {
+            .desktop-grid {
+                grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+                gap: 20px;
+                padding: 130px 40px 40px;
+            }
+        }
+
+        /* ============================================
+           REELS-STYLE VIDEO PLAYER
+           ============================================ */
+        .reels-player {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #000;
+            z-index: 200;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .reels-player.active {
+            display: block;
+        }
+
+        .reels-player::-webkit-scrollbar {
+            display: none;
+        }
+
+        .reel-slide {
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+        }
+
+        .reel-slide iframe,
+        .reel-slide video {
+            border: none;
+            background: black;
+        }
+
+        /* Mobile: full viewport */
+        @media (max-width: 899px) {
+            .reel-slide iframe,
+            .reel-slide video {
+                width: 100vw;
+                height: 100vh;
+                height: 100dvh;
+                object-fit: contain;
+            }
+        }
+
+        /* Desktop: centered with max width */
+        @media (min-width: 900px) {
+            .reel-slide iframe,
+            .reel-slide video {
+                width: 100%;
+                max-width: 560px;
+                height: 80vh;
+                border-radius: 12px;
+            }
+        }
+
+        .reel-close {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: none;
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 220;
+            transition: background 0.2s;
+        }
+
+        .reel-close:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .reel-info {
+            position: absolute;
+            bottom: 80px;
+            left: 16px;
+            right: 70px;
+            z-index: 210;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+        }
+
+        .reel-title {
+            font-size: 15px;
+            font-weight: 600;
+            line-height: 1.3;
+            margin-bottom: 6px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .reel-creator {
+            font-size: 13px;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .reel-category-badge {
+            display: inline-block;
+            font-size: 11px;
+            padding: 3px 8px;
+            background: rgba(57,255,20,0.2);
+            color: var(--neon);
+            border-radius: 4px;
+            margin-top: 6px;
+        }
+
+        .reel-actions {
+            position: absolute;
+            bottom: 100px;
+            right: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 210;
+        }
+
+        .reel-action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+
+        .reel-action-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: background 0.2s;
+        }
+
+        .reel-action-icon:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .reel-action-count {
+            font-size: 11px;
+            color: rgba(255,255,255,0.7);
+        }
+
+        /* Gradient overlays for readability */
+        .reel-slide::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 250px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            pointer-events: none;
+            z-index: 205;
+        }
+
+        .reel-slide .reel-info,
+        .reel-slide .reel-actions {
+            z-index: 210;
+        }
+
+        /* Scroll hint */
+        .reel-scroll-hint {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 210;
+            color: rgba(255,255,255,0.4);
+            font-size: 12px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-8px); }
+        }
+
+        /* ============================================
+           LOADING & EMPTY STATES
+           ============================================ */
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: var(--neon);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-dim);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <span class="logo-icon">🤖</span>
+            <span>ClankerVids</span>
+        </div>
+        
+        <div class="search-box">
+            <span>🔍</span>
+            <input type="text" placeholder="Search robots..." id="searchInput">
+        </div>
+        
+        <div class="header-actions">
+            <button class="header-btn" onclick="refreshFeed()">🔄</button>
+            <button class="header-btn" onclick="window.location.href='/upload.html'">⬆️ Upload</button>
+        </div>
+    </header>
+
+    <!-- Categories -->
+    <div class="categories">
+        <div class="category-pill active" data-category="all">🔥 All</div>
+        <div class="category-pill" data-category="fails">💥 Fails</div>
+        <div class="category-pill" data-category="highlights">✨ Highlights</div>
+        <div class="category-pill" data-category="battles">⚔️ Battles</div>
+        <div class="sort-divider">|</div>
+        <div class="category-pill sort-pill active" data-sort="recent">🆕 New</div>
+        <div class="category-pill sort-pill" data-sort="popular">👁 Popular</div>
+        <div class="category-pill sort-pill" data-sort="random">🎲 Random</div>
+    </div>
+
+    <!-- Mobile TikTok Feed -->
+    <div class="mobile-feed" id="mobileFeed">
+        <div class="loading" id="mobileLoading">
+            <div class="loading-spinner"></div>
+            <p style="margin-top: 12px; color: var(--neon); font-size: 14px;">Loading robots...</p>
+        </div>
+    </div>
+
+    <!-- Desktop YouTube Grid -->
+    <div class="desktop-grid" id="desktopGrid">
+        <!-- Videos will be rendered here -->
+    </div>
+
+    <!-- Bottom Navigation (Mobile) -->
+    <nav class="bottom-nav">
+        <div class="nav-item active">
+            <span class="nav-icon">🏠</span>
+            <span>Home</span>
+        </div>
+        <div class="nav-item">
+            <span class="nav-icon">🔍</span>
+            <span>Discover</span>
+        </div>
+        <div class="nav-item" onclick="window.location.href='/upload.html'">
+            <span class="nav-icon">➕</span>
+            <span>Upload</span>
+        </div>
+        <div class="nav-item">
+            <span class="nav-icon">🏆</span>
+            <span>Top</span>
+        </div>
+    </nav>
+
+    <!-- Reels-Style Video Player -->
+    <div class="reels-player" id="reelsPlayer">
+        <button class="reel-close" onclick="closeReels()">✕</button>
+    </div>
+
+    <!-- HLS.js for Reddit video playback -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+    <script>
+        let videos = [];
+        let currentCategory = 'all';
+        let currentSort = 'recent';
+        let userReactions = JSON.parse(localStorage.getItem('clankervids_reactions') || '{}');
+        let hlsPlayers = {};
+        let currentReelIndex = 0;
+        let reelsObserver = null;
+
+        // Detect mobile vs desktop
+        function isMobile() {
+            return window.innerWidth < 900;
+        }
+
+        // Fetch videos
+        async function fetchVideos(category = 'all', sort = 'recent') {
+            try {
+                let url = `/api/videos?sort=${sort}`;
+                if (category !== 'all') {
+                    url += `&category=${category}`;
+                }
+                
+                const response = await fetch(url);
+                videos = await response.json();
+                
+                if (sort === 'random') {
+                    videos = shuffleArray(videos);
+                }
+                
+                renderFeed();
+            } catch (error) {
+                console.error('Error loading videos:', error);
+                showError();
+            }
+        }
+
+        // Shuffle array
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // Render appropriate feed based on screen size
+        function renderFeed() {
+            if (isMobile()) {
+                renderMobileFeed();
+            } else {
+                renderDesktopGrid();
+            }
+        }
+
+        // Mobile TikTok-style feed
+        function renderMobileFeed() {
+            const container = document.getElementById('mobileFeed');
+            
+            if (videos.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">🤖</div><p>No videos found</p></div>';
+                return;
+            }
+
+            container.innerHTML = videos.map((video, index) => {
+                const youtubeId = extractYouTubeId(video.video_url);
+                const thumbnail = video.thumbnail_url || (youtubeId ? `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg` : '');
+                const isLiked = userReactions[video.id]?.clank;
+                
+                return `
+                    <div class="video-card-mobile" data-video-id="${video.id}">
+                        <div class="video-wrapper-mobile">
+                            ${thumbnail ? `<img class="thumbnail-mobile" src="${thumbnail}" alt="" onerror="this.style.display='none'">` : ''}
+                            <div class="play-icon-mobile" onclick="playVideo('${video.id}', '${video.video_url}')"></div>
+                            
+                            <div class="video-info-mobile">
+                                <div class="video-creator-mobile">${video.creator || '@clankervids'}</div>
+                                <div class="video-title-mobile">${video.title}</div>
+                                <div class="video-tags-mobile">
+                                    <span>${getCategoryEmoji(video.category)} ${video.category}</span>
+                                    <span>👁 ${formatNumber(video.views || video.view_count || 0)}</span>
+                                </div>
+                            </div>
+
+                            <div class="action-buttons-mobile">
+                                <div class="action-btn-mobile ${isLiked ? 'liked' : ''}" onclick="react('${video.id}', 'clank')">
+                                    <div class="action-icon-mobile">🤖</div>
+                                    <span class="action-count-mobile">${formatNumber(video.clanks || video.clank_count || 0)}</span>
+                                </div>
+                                <div class="action-btn-mobile" onclick="react('${video.id}', 'fail')">
+                                    <div class="action-icon-mobile">💥</div>
+                                    <span class="action-count-mobile">${formatNumber(video.system_errors || video.fail_count || 0)}</span>
+                                </div>
+                                <div class="action-btn-mobile" onclick="shareVideo('${video.id}', '${video.title}')">
+                                    <div class="action-icon-mobile">↗️</div>
+                                    <span class="action-count-mobile">Share</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Desktop YouTube-style grid
+        function renderDesktopGrid() {
+            const container = document.getElementById('desktopGrid');
+            
+            if (videos.length === 0) {
+                container.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><div class="empty-icon">🤖</div><p>No videos found</p></div>';
+                return;
+            }
+
+            container.innerHTML = videos.map((video) => {
+                const youtubeId = extractYouTubeId(video.video_url);
+                const thumbnail = video.thumbnail_url || (youtubeId ? `https://i.ytimg.com/vi/${youtubeId}/mqdefault.jpg` : '');
+                const views = video.views || video.view_count || 0;
+                const timeAgo = getTimeAgo(video.created_at);
+                
+                return `
+                    <div class="video-card-desktop" onclick="playVideo('${video.id}', '${video.video_url}')">
+                        <div class="thumbnail-container">
+                            ${thumbnail ? `<img class="thumbnail-desktop" src="${thumbnail}" alt="" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 9%22><rect fill=%22%231a1a1a%22 width=%2216%22 height=%229%22/><text x=%228%22 y=%225%22 text-anchor=%22middle%22 fill=%22%23333%22 font-size=%222%22>🤖</text></svg>'">` : ''}
+                            <span class="category-badge">${getCategoryEmoji(video.category)} ${video.category}</span>
+                        </div>
+                        <div class="video-details">
+                            <div class="channel-avatar">${getCategoryEmoji(video.category)}</div>
+                            <div class="video-meta">
+                                <div class="video-title-desktop">${video.title}</div>
+                                <div class="video-creator-desktop">${video.creator || 'ClankerVids'}</div>
+                                <div class="video-stats">
+                                    <span>${formatNumber(views)} views</span>
+                                    <span>•</span>
+                                    <span>${timeAgo}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Helper functions
+        function extractYouTubeId(url) {
+            if (!url) return null;
+            const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+            return match ? match[1] : null;
+        }
+
+        function getCategoryEmoji(category) {
+            return { 'fails': '💥', 'highlights': '✨', 'battles': '⚔️' }[category] || '🤖';
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num.toString();
+        }
+
+        function getTimeAgo(dateStr) {
+            if (!dateStr) return 'recently';
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 0) return 'today';
+            if (diffDays === 1) return 'yesterday';
+            if (diffDays < 7) return `${diffDays} days ago`;
+            if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+            if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
+            return `${Math.floor(diffDays / 365)} years ago`;
+        }
+
+        // Open Reels player starting at a specific video
+        function playVideo(videoId, videoUrl) {
+            const player = document.getElementById('reelsPlayer');
+            
+            // Find starting index
+            const startIdx = videos.findIndex(v => String(v.id) === String(videoId));
+            currentReelIndex = startIdx >= 0 ? startIdx : 0;
+
+            // Build all reel slides
+            player.innerHTML = '<button class="reel-close" onclick="closeReels()">✕</button>';
+            
+            videos.forEach((video, idx) => {
+                const slide = document.createElement('div');
+                slide.className = 'reel-slide';
+                slide.dataset.index = idx;
+                slide.dataset.videoId = video.id;
+                slide.dataset.videoUrl = video.video_url;
+                slide.dataset.loaded = 'false';
+                
+                const ytId = extractYouTubeId(video.video_url);
+                const thumbnail = video.thumbnail_url || (ytId ? `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg` : '');
+                
+                // Placeholder thumbnail until slide is active
+                slide.innerHTML = `
+                    ${thumbnail ? `<img src="${thumbnail}" style="position:absolute;width:100%;height:100%;object-fit:cover;opacity:0.3;" alt="">` : ''}
+                    <div class="reel-info">
+                        <div class="reel-title">${video.title}</div>
+                        <div class="reel-creator">${video.creator || '@clankervids'}</div>
+                        <span class="reel-category-badge">${getCategoryEmoji(video.category)} ${video.category}</span>
+                    </div>
+                    <div class="reel-actions">
+                        <div class="reel-action-btn" onclick="react('${video.id}', 'clank')">
+                            <div class="reel-action-icon">🤖</div>
+                            <span class="reel-action-count">${formatNumber(video.clanks || video.clank_count || 0)}</span>
+                        </div>
+                        <div class="reel-action-btn" onclick="react('${video.id}', 'fail')">
+                            <div class="reel-action-icon">💥</div>
+                            <span class="reel-action-count">${formatNumber(video.system_errors || video.fail_count || 0)}</span>
+                        </div>
+                        <div class="reel-action-btn" onclick="shareVideo('${video.id}', '${video.title.replace(/'/g, "\\'")}')">
+                            <div class="reel-action-icon">↗️</div>
+                            <span class="reel-action-count">Share</span>
+                        </div>
+                    </div>
+                    ${idx === currentReelIndex + 1 ? '<div class="reel-scroll-hint">↓ Scroll for more</div>' : ''}
+                `;
+                
+                player.appendChild(slide);
+            });
+
+            // Show player
+            player.classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            // Scroll to starting video
+            const targetSlide = player.querySelectorAll('.reel-slide')[currentReelIndex];
+            if (targetSlide) {
+                targetSlide.scrollIntoView({ behavior: 'instant' });
+            }
+
+            // Set up IntersectionObserver to load/unload videos as they scroll into view
+            if (reelsObserver) reelsObserver.disconnect();
+            reelsObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const slide = entry.target;
+                    const idx = parseInt(slide.dataset.index);
+                    
+                    if (entry.isIntersecting && entry.intersectionRatio > 0.6) {
+                        loadReelVideo(slide);
+                        // Track view
+                        fetch('/api/react', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ video_id: slide.dataset.videoId, reaction_type: 'view' })
+                        }).catch(() => {});
+                    } else if (!entry.isIntersecting) {
+                        unloadReelVideo(slide);
+                    }
+                });
+            }, { root: player, threshold: [0.6] });
+
+            player.querySelectorAll('.reel-slide').forEach(s => reelsObserver.observe(s));
+
+            // Immediately load the starting video
+            loadReelVideo(targetSlide);
+        }
+
+        // Load video into a reel slide
+        function loadReelVideo(slide) {
+            if (!slide || slide.dataset.loaded === 'true') return;
+            slide.dataset.loaded = 'true';
+
+            const videoUrl = slide.dataset.videoUrl;
+            const ytId = extractYouTubeId(videoUrl);
+            
+            // Remove placeholder thumbnail
+            const placeholderImg = slide.querySelector('img');
+            
+            if (ytId) {
+                const iframe = document.createElement('iframe');
+                iframe.src = `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1&playsinline=1`;
+                iframe.allowFullscreen = true;
+                iframe.allow = 'autoplay; encrypted-media';
+                slide.insertBefore(iframe, slide.firstChild);
+            } else if (videoUrl.includes('v.redd.it')) {
+                const vid = document.createElement('video');
+                vid.controls = true;
+                vid.autoplay = true;
+                vid.playsInline = true;
+                vid.loop = true;
+                slide.insertBefore(vid, slide.firstChild);
+
+                const hlsUrl = videoUrl + '/HLSPlaylist.m3u8';
+                if (Hls.isSupported()) {
+                    const hls = new Hls();
+                    hls.loadSource(hlsUrl);
+                    hls.attachMedia(vid);
+                    hls.on(Hls.Events.MANIFEST_PARSED, () => vid.play());
+                    hlsPlayers[slide.dataset.index] = hls;
+                } else if (vid.canPlayType('application/vnd.apple.mpegurl')) {
+                    vid.src = hlsUrl;
+                    vid.play();
+                }
+            } else {
+                const vid = document.createElement('video');
+                vid.src = videoUrl;
+                vid.controls = true;
+                vid.autoplay = true;
+                vid.playsInline = true;
+                vid.loop = true;
+                slide.insertBefore(vid, slide.firstChild);
+                vid.play();
+            }
+            
+            if (placeholderImg) placeholderImg.style.display = 'none';
+        }
+
+        // Unload video from a reel slide to save memory
+        function unloadReelVideo(slide) {
+            if (!slide || slide.dataset.loaded !== 'true') return;
+            
+            const iframe = slide.querySelector('iframe');
+            const video = slide.querySelector('video');
+            
+            if (iframe) {
+                iframe.src = '';
+                iframe.remove();
+            }
+            if (video) {
+                video.pause();
+                video.src = '';
+                video.remove();
+            }
+            
+            // Cleanup HLS
+            const idx = slide.dataset.index;
+            if (hlsPlayers[idx]) {
+                hlsPlayers[idx].destroy();
+                delete hlsPlayers[idx];
+            }
+            
+            // Show placeholder again
+            const img = slide.querySelector('img');
+            if (img) img.style.display = '';
+            
+            slide.dataset.loaded = 'false';
+        }
+
+        // Close reels player
+        function closeReels() {
+            const player = document.getElementById('reelsPlayer');
+            
+            // Unload all videos
+            player.querySelectorAll('.reel-slide').forEach(unloadReelVideo);
+            
+            // Cleanup HLS players
+            Object.keys(hlsPlayers).forEach(k => {
+                hlsPlayers[k].destroy();
+                delete hlsPlayers[k];
+            });
+            
+            if (reelsObserver) {
+                reelsObserver.disconnect();
+                reelsObserver = null;
+            }
+            
+            player.classList.remove('active');
+            player.innerHTML = '<button class="reel-close" onclick="closeReels()">✕</button>';
+            document.body.style.overflow = '';
+        }
+
+        // React to video
+        async function react(videoId, type) {
+            const reactionMap = { 'clank': 'clank', 'fail': 'epic_fail' };
+            
+            try {
+                await fetch('/api/react', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ video_id: videoId, reaction_type: reactionMap[type] || type })
+                });
+                
+                if (!userReactions[videoId]) userReactions[videoId] = {};
+                userReactions[videoId][type] = true;
+                localStorage.setItem('clankervids_reactions', JSON.stringify(userReactions));
+            } catch (error) {
+                console.error('Reaction error:', error);
+            }
+        }
+
+        // Share video
+        function shareVideo(videoId, title) {
+            const url = `${window.location.origin}?v=${videoId}`;
+            if (navigator.share) {
+                navigator.share({ title: `ClankerVids: ${title}`, url: url });
+            } else {
+                navigator.clipboard.writeText(url);
+                alert('Link copied!');
+            }
+        }
+
+        // Refresh feed
+        function refreshFeed() {
+            if (isMobile()) {
+                document.getElementById('mobileFeed').innerHTML = '<div class="loading"><div class="loading-spinner"></div></div>';
+            } else {
+                document.getElementById('desktopGrid').innerHTML = '<div class="loading" style="grid-column:1/-1;"><div class="loading-spinner"></div></div>';
+            }
+            fetchVideos(currentCategory, currentSort);
+        }
+
+        function showError() {
+            const msg = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>Failed to load videos</p><button onclick="refreshFeed()" style="margin-top:12px;padding:8px 16px;background:var(--neon);color:black;border:none;border-radius:8px;cursor:pointer;">Try Again</button></div>';
+            document.getElementById('mobileFeed').innerHTML = msg;
+            document.getElementById('desktopGrid').innerHTML = `<div style="grid-column:1/-1;">${msg}</div>`;
+        }
+
+        // Category selection
+        document.querySelectorAll('.category-pill[data-category]').forEach(pill => {
+            pill.addEventListener('click', () => {
+                document.querySelectorAll('.category-pill[data-category]').forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+                currentCategory = pill.dataset.category;
+                refreshFeed();
+            });
+        });
+
+        // Sort selection
+        document.querySelectorAll('.sort-pill').forEach(pill => {
+            pill.addEventListener('click', () => {
+                document.querySelectorAll('.sort-pill').forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+                currentSort = pill.dataset.sort;
+                refreshFeed();
+            });
+        });
+
+        // Close reels on escape
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeReels(); });
+
+        // Re-render on resize (debounced)
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => renderFeed(), 250);
+        });
+
+        // Search (desktop)
+        document.getElementById('searchInput')?.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const query = e.target.value.toLowerCase();
+                if (query) {
+                    const filtered = videos.filter(v => v.title.toLowerCase().includes(query));
+                    videos = filtered.length ? filtered : videos;
+                    renderFeed();
+                } else {
+                    fetchVideos(currentCategory, currentSort);
+                }
+            }
+        });
+
+        // Initialize
+        fetchVideos();
+    </script>
+</body>
+</html>
