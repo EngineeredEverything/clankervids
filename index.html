@@ -800,6 +800,63 @@
             font-size: 48px;
             margin-bottom: 16px;
         }
+
+        /* ============================================
+           TOAST NOTIFICATIONS
+           ============================================ */
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 300;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Keyboard shortcut hints */
+        .keyboard-hints {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+            z-index: 250;
+            display: none;
+        }
+
+        .reels-player.active ~ .keyboard-hints {
+            display: block;
+        }
+
+        .keyboard-hints kbd {
+            display: inline-block;
+            padding: 2px 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 11px;
+            margin: 0 2px;
+        }
     </style>
 </head>
 <body>
@@ -869,6 +926,14 @@
     <!-- Reels-Style Video Player -->
     <div class="reels-player" id="reelsPlayer">
         <button class="reel-close" onclick="closeReels()">✕</button>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Keyboard Hints (show when reels active) -->
+    <div class="keyboard-hints">
+        <kbd>↑</kbd> <kbd>↓</kbd> Navigate &nbsp;·&nbsp; <kbd>Space</kbd> Play/Pause &nbsp;·&nbsp; <kbd>Esc</kbd> Close
     </div>
 
     <!-- HLS.js for Reddit video playback -->
@@ -1243,6 +1308,12 @@
         async function react(videoId, type) {
             const reactionMap = { 'clank': 'clank', 'fail': 'epic_fail' };
             
+            // Check if already reacted
+            if (userReactions[videoId]?.[type]) {
+                showToast(type === 'clank' ? '🤖 Already Clanked!' : '💥 Already Failed!');
+                return;
+            }
+            
             try {
                 await fetch('/api/react', {
                     method: 'POST',
@@ -1253,9 +1324,23 @@
                 if (!userReactions[videoId]) userReactions[videoId] = {};
                 userReactions[videoId][type] = true;
                 localStorage.setItem('clankervids_reactions', JSON.stringify(userReactions));
+                
+                // Show feedback
+                showToast(type === 'clank' ? '🤖 Clanked!' : '💥 System Error!');
             } catch (error) {
                 console.error('Reaction error:', error);
+                showToast('⚠️ Failed to react');
             }
+        }
+
+        // Show toast notification
+        function showToast(message, duration = 2000) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
         }
 
         // Share video
@@ -1265,7 +1350,7 @@
                 navigator.share({ title: `ClankerVids: ${title}`, url: url });
             } else {
                 navigator.clipboard.writeText(url);
-                alert('Link copied!');
+                showToast('🔗 Link copied!');
             }
         }
 
@@ -1305,8 +1390,47 @@
             });
         });
 
-        // Close reels on escape
-        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeReels(); });
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            const player = document.getElementById('reelsPlayer');
+            
+            // Escape - close reels
+            if (e.key === 'Escape' && player.classList.contains('active')) {
+                closeReels();
+                return;
+            }
+            
+            // Arrow keys and space - only when reels player is active
+            if (!player.classList.contains('active')) return;
+            
+            const slides = player.querySelectorAll('.reel-slide');
+            const currentSlide = Array.from(slides).find(s => {
+                const rect = s.getBoundingClientRect();
+                return rect.top >= 0 && rect.top < window.innerHeight / 2;
+            });
+            
+            if (!currentSlide) return;
+            const currentIdx = parseInt(currentSlide.dataset.index);
+            
+            // Arrow Up/Down - navigate reels
+            if (e.key === 'ArrowUp' && currentIdx > 0) {
+                e.preventDefault();
+                slides[currentIdx - 1].scrollIntoView({ behavior: 'smooth' });
+            } else if (e.key === 'ArrowDown' && currentIdx < slides.length - 1) {
+                e.preventDefault();
+                slides[currentIdx + 1].scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            // Space - pause/play video
+            else if (e.key === ' ') {
+                e.preventDefault();
+                const video = currentSlide.querySelector('video');
+                if (video) {
+                    if (video.paused) video.play();
+                    else video.pause();
+                }
+            }
+        });
 
         // Re-render on resize (debounced)
         let resizeTimeout;
