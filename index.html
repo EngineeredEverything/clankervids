@@ -43,8 +43,31 @@
     }
     </script>
     
-    <link rel="icon" type="image/png" href="https://clankervids-cdn.b-cdn.net/assets/clankervids_logo.png">
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#39FF14">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ClankerVids">
+    <link rel="apple-touch-icon" href="/favicon-192.png">
+    
+    <link rel="icon" type="image/png" href="/favicon-192.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Simple Analytics (privacy-friendly) -->
+    <script>
+        // Lightweight pageview tracking
+        if (window.location.hostname !== 'localhost') {
+            fetch('/api/pageview', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    url: window.location.pathname + window.location.search,
+                    referrer: document.referrer || 'direct'
+                })
+            }).catch(() => {});
+        }
+    </script>
     <style>
         * {
             margin: 0;
@@ -873,8 +896,9 @@
         </div>
         
         <div class="header-actions">
-            <button class="header-btn" onclick="refreshFeed()">🔄</button>
-            <button class="header-btn" onclick="window.location.href='/upload.html'">⬆️ Upload</button>
+            <button class="header-btn" onclick="playRandomVideo()" title="Random Video">🎲</button>
+            <button class="header-btn" onclick="refreshFeed()" title="Refresh">🔄</button>
+            <button class="header-btn" onclick="window.location.href='/upload.html'" title="Upload">⬆️ Upload</button>
         </div>
     </header>
 
@@ -1352,6 +1376,17 @@
                 navigator.clipboard.writeText(url);
                 showToast('🔗 Link copied!');
             }
+        }
+
+        // Play random video
+        function playRandomVideo() {
+            if (videos.length === 0) {
+                showToast('⏳ Loading videos...');
+                return;
+            }
+            const randomVideo = videos[Math.floor(Math.random() * videos.length)];
+            playVideo(randomVideo.id, randomVideo.video_url);
+            showToast('🎲 Random video!');
         }
 
         // Refresh feed

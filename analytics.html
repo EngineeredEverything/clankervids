@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClankerVids Analytics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0f0f0f;
+            color: #fff;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #39FF14 0%, #00ff88 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        
+        .stat-card {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .stat-label {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #39FF14;
+        }
+        
+        .chart-card {
+            background: #1a1a1a;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 24px;
+        }
+        
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        th {
+            font-weight: 600;
+            color: #888;
+            font-size: 13px;
+        }
+        
+        tr:hover {
+            background: rgba(255,255,255,0.02);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 ClankerVids Analytics</h1>
+        
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-label">Total Videos</div>
+                <div class="stat-value" id="totalVideos">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Views (24h)</div>
+                <div class="stat-value" id="viewsToday">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Reactions</div>
+                <div class="stat-value" id="totalReactions">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Pageviews (7d)</div>
+                <div class="stat-value" id="pageviews7d">—</div>
+            </div>
+        </div>
+        
+        <div class="chart-card">
+            <div class="chart-title">Top Videos (by views)</div>
+            <table id="topVideos">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Views</th>
+                        <th>🤖 Clanks</th>
+                        <th>💥 Fails</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td colspan="5" class="loading">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="chart-card">
+            <div class="chart-title">Recent Pageviews</div>
+            <table id="recentPageviews">
+                <thead>
+                    <tr>
+                        <th>URL</th>
+                        <th>Referrer</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td colspan="3" class="loading">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+        async function loadAnalytics() {
+            try {
+                // Fetch video stats
+                const videosRes = await fetch('/api/videos?sort=popular&limit=100');
+                const videos = await videosRes.json();
+                
+                document.getElementById('totalVideos').textContent = videos.length;
+                
+                const totalViews = videos.reduce((sum, v) => sum + (v.views || v.view_count || 0), 0);
+                const totalReactions = videos.reduce((sum, v) => 
+                    sum + (v.clanks || v.clank_count || 0) + (v.system_errors || v.fail_count || 0), 0);
+                
+                document.getElementById('viewsToday').textContent = totalViews.toLocaleString();
+                document.getElementById('totalReactions').textContent = totalReactions.toLocaleString();
+                
+                // Top videos
+                const topVideos = videos
+                    .sort((a, b) => (b.views || b.view_count || 0) - (a.views || a.view_count || 0))
+                    .slice(0, 10);
+                
+                const tbody = document.querySelector('#topVideos tbody');
+                tbody.innerHTML = topVideos.map(v => `
+                    <tr>
+                        <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${v.title}</td>
+                        <td>${v.category}</td>
+                        <td>${(v.views || v.view_count || 0).toLocaleString()}</td>
+                        <td>${(v.clanks || v.clank_count || 0).toLocaleString()}</td>
+                        <td>${(v.system_errors || v.fail_count || 0).toLocaleString()}</td>
+                    </tr>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Analytics error:', error);
+            }
+        }
+        
+        // Load on page load
+        loadAnalytics();
+        
+        // Refresh every 30 seconds
+        setInterval(loadAnalytics, 30000);
+    </script>
+</body>
+</html>

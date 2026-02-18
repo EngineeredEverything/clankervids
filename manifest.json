@@ -1,0 +1,48 @@
+{
+  "name": "ClankerVids",
+  "short_name": "ClankerVids",
+  "description": "Watch the best robot fails, AI highlights, and epic bot moments",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f0f0f",
+  "theme_color": "#39FF14",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["entertainment", "video"],
+  "shortcuts": [
+    {
+      "name": "Robot Fails",
+      "short_name": "Fails",
+      "description": "Watch epic robot failures",
+      "url": "/?category=fails",
+      "icons": [{ "src": "/favicon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Highlights",
+      "short_name": "Highlights",
+      "description": "Amazing robot moments",
+      "url": "/?category=highlights",
+      "icons": [{ "src": "/favicon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Battles",
+      "short_name": "Battles",
+      "description": "Robot combat action",
+      "url": "/?category=battles",
+      "icons": [{ "src": "/favicon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

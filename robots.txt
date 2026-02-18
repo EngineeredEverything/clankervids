@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://clankervids.com/sitemap.xml
+
+# Crawl-delay (be nice to servers)
+Crawl-delay: 1
+
+# Priority pages
+Allow: /
+Allow: /?category=fails
+Allow: /?category=highlights
+Allow: /?category=battles
+
+# Block admin/api endpoints
+Disallow: /api/
+Disallow: /admin/
