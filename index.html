@@ -979,6 +979,85 @@
         .email-signup-msg.error {
             color: #ff4444;
         }
+
+        /* Daily Digest Player Bar */
+        .digest-bar {
+            background: linear-gradient(90deg, #0f0f1a 0%, #1a1a2e 50%, #0f0f1a 100%);
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+            border-top: 1px solid rgba(0, 255, 136, 0.1);
+            padding: 8px 16px;
+            position: sticky;
+            top: 60px;
+            z-index: 90;
+        }
+        .digest-inner {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .digest-play-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid var(--neon, #00ff88);
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--neon, #00ff88);
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: background 0.2s;
+        }
+        .digest-play-btn:hover {
+            background: rgba(0, 255, 136, 0.25);
+        }
+        .digest-info {
+            flex-shrink: 0;
+        }
+        .digest-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--neon, #00ff88);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .digest-date {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 1px;
+        }
+        .digest-progress-wrap {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .digest-progress-bar {
+            flex: 1;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .digest-progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--neon, #00ff88);
+            border-radius: 2px;
+            transition: width 0.5s linear;
+        }
+        .digest-time {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            font-variant-numeric: tabular-nums;
+            min-width: 32px;
+            text-align: right;
+        }
     </style>
 </head>
 <body>
@@ -1012,6 +1091,26 @@
         <div class="category-pill sort-pill" data-sort="popular">👁 Popular</div>
         <div class="category-pill sort-pill" data-sort="trending">🔥 Trending</div>
         <div class="category-pill sort-pill" data-sort="random">🎲 Random</div>
+    </div>
+
+    <!-- Daily Robot Digest Player -->
+    <div class="digest-bar" id="digestBar" style="display:none">
+        <div class="digest-inner">
+            <button class="digest-play-btn" id="digestPlayBtn" onclick="toggleDigest()" title="Play Daily Digest">
+                <span id="digestPlayIcon">▶</span>
+            </button>
+            <div class="digest-info">
+                <div class="digest-label">🎙️ Daily Robot Digest</div>
+                <div class="digest-date" id="digestDate">Loading...</div>
+            </div>
+            <div class="digest-progress-wrap">
+                <div class="digest-progress-bar">
+                    <div class="digest-progress-fill" id="digestProgressFill"></div>
+                </div>
+                <span class="digest-time" id="digestTime">0:00</span>
+            </div>
+        </div>
+        <audio id="digestAudio" preload="none"></audio>
     </div>
 
     <!-- Mobile TikTok Feed -->
@@ -1642,6 +1741,73 @@
                 btn.textContent = 'Subscribe 🤖';
             }
         }
+
+        // ============================================================
+        // DAILY DIGEST PLAYER
+        // ============================================================
+        let digestLoaded = false;
+
+        async function initDigest() {
+            try {
+                const resp = await fetch('/api/digest');
+                if (!resp.ok) return;
+                const data = await resp.json();
+                if (!data.audio_available) return;
+
+                const bar = document.getElementById('digestBar');
+                const dateEl = document.getElementById('digestDate');
+                const audio = document.getElementById('digestAudio');
+
+                dateEl.textContent = data.date || 'Today';
+                audio.src = data.audio_url || '/public/daily_digest.mp3';
+
+                // Progress bar update
+                audio.addEventListener('timeupdate', () => {
+                    if (!audio.duration) return;
+                    const pct = (audio.currentTime / audio.duration) * 100;
+                    document.getElementById('digestProgressFill').style.width = pct + '%';
+                    const m = Math.floor(audio.currentTime / 60);
+                    const s = Math.floor(audio.currentTime % 60).toString().padStart(2, '0');
+                    document.getElementById('digestTime').textContent = `${m}:${s}`;
+                });
+
+                audio.addEventListener('ended', () => {
+                    document.getElementById('digestPlayIcon').textContent = '▶';
+                    document.getElementById('digestProgressFill').style.width = '0%';
+                    document.getElementById('digestTime').textContent = '0:00';
+                    audio.currentTime = 0;
+                });
+
+                // Click on progress bar to seek
+                document.querySelector('.digest-progress-bar').addEventListener('click', (e) => {
+                    if (!audio.duration) return;
+                    const rect = e.target.getBoundingClientRect();
+                    const pct = (e.clientX - rect.left) / rect.width;
+                    audio.currentTime = pct * audio.duration;
+                });
+
+                bar.style.display = 'block';
+                digestLoaded = true;
+            } catch (e) {
+                // No digest available — stay hidden
+            }
+        }
+
+        function toggleDigest() {
+            const audio = document.getElementById('digestAudio');
+            const icon = document.getElementById('digestPlayIcon');
+            if (audio.paused) {
+                audio.play();
+                icon.textContent = '⏸';
+            } else {
+                audio.pause();
+                icon.textContent = '▶';
+            }
+        }
+
+        // Load digest on page init
+        initDigest();
+
     </script>
 </body>
 </html>

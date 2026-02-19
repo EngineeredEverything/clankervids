@@ -383,6 +383,26 @@ def get_analytics_stats():
 
 
 # ============================================================
+# DAILY DIGEST
+# ============================================================
+
+@app.route('/api/digest', methods=['GET'])
+def get_digest():
+    """Get the latest daily robot digest metadata and audio URL."""
+    import json as _json
+    meta_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'public', 'daily_digest.json')
+    audio_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'public', 'daily_digest.mp3')
+    if not os.path.isfile(meta_path):
+        return jsonify({'error': 'No digest available yet'}), 404
+    with open(meta_path, 'r') as f:
+        meta = _json.load(f)
+    meta['audio_available'] = os.path.isfile(audio_path)
+    resp = jsonify(meta)
+    resp.headers['Cache-Control'] = 'public, max-age=300'
+    return resp
+
+
+# ============================================================
 # HEALTH + STATIC
 # ============================================================
 

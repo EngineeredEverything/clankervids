@@ -1,0 +1,43 @@
+{
+  "generated_at": "2026-02-19T07:14:52.579060",
+  "date": "Thursday, February 19, 2026",
+  "script": "What's up, it's your Daily Robot Digest for Thursday, February 19. ClankerVids is running 95 robot videos across 3 categories. We've got 58 highlights, 28 fails, 9 battles. Here are the top picks right now. Number one: 'Unitree G1 Humanoid Robot Boxing: All the WILDEST Highlights \u2014 What The Future'. Over 0.2 million views \u2014 this one's a monster. Coming in at number two: 'Robots run, punch and score at World Humanoid Robot Games in China'. Pure robotic excellence. Third pick: 'Boston Dynamics: New Robots Now Fight Back'. Also trending: 'Robot Fails at the World Games \ud83e\udd16\ud83d\ude02 #robots #ai #fyp #foryou #viral #trending #...'. And rounding out the top five: 'TOP ROBOT FAIL COMPILATION'. That's your robot digest. Hit up ClankerVids dot com for the full feed \u2014 updated every six hours with fresh content. Stay clunky out there.",
+  "top_videos": [
+    {
+      "id": "9098ddeb-4737-4a66-b65d-67e3a92ecf21",
+      "title": "Unitree G1 Humanoid Robot Boxing: All the WILDEST Highlights \u2014 What The Future",
+      "category": "highlights",
+      "youtube_id": "rdkwjs_g83w",
+      "views": 226075
+    },
+    {
+      "id": "de2031b6-d751-4057-8126-35cb61362291",
+      "title": "Robots run, punch and score at World Humanoid Robot Games in China",
+      "category": "highlights",
+      "youtube_id": "LXQ6Rm9CGTo",
+      "views": 217603
+    },
+    {
+      "id": "a2e50cfa-faaa-4e5f-91c0-12f664ca3240",
+      "title": "Boston Dynamics: New Robots Now Fight Back",
+      "category": "battles",
+      "youtube_id": "dKjCWfuvYxQ",
+      "views": 207140
+    },
+    {
+      "id": "c35ba362-2a0f-4d5f-a430-da0f94890231",
+      "title": "Robot Fails at the World Games \ud83e\udd16\ud83d\ude02 #robots #ai #fyp #foryou #viral #trending #...",
+      "category": "fails",
+      "youtube_id": "68Fag4IM8_4",
+      "views": 182657
+    },
+    {
+      "id": "a369a411-551d-428d-8108-7ae28ed5d37b",
+      "title": "TOP ROBOT FAIL COMPILATION",
+      "category": "fails",
+      "youtube_id": "9NSbTK4j_D0",
+      "views": 178271
+    }
+  ],
+  "audio_url": "/public/daily_digest.mp3"
+}
