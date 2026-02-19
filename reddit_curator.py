@@ -31,18 +31,25 @@ class RedditCurator:
         
         # Robot-focused subreddits
         self.subreddits = [
-            'shittyrobots',       # Classic robot fails
-            'robotics',           # Serious robotics
-            'Battlebots',         # Robot battles
-            'BostonDynamics',     # Boston Dynamics content
-            'MachineLearning',    # AI/ML
-            'Futurology',         # Tech future
-            'interestingasfuck',  # Viral content (filter for robots)
-            'nextfuckinglevel',   # Amazing tech (filter for robots)
-            'funny',              # Viral funny (filter for robots)
-            'technology',         # Tech news
-            'EngineeringPorn',    # Cool engineering
-            'MechanicalGifs',     # Mechanical content
+            'shittyrobots',           # Classic robot fails
+            'robotics',               # Serious robotics
+            'Battlebots',             # Robot battles
+            'BostonDynamics',         # Boston Dynamics content
+            'MachineLearning',        # AI/ML
+            'artificial',             # Artificial intelligence
+            'Futurology',             # Tech future
+            'interestingasfuck',      # Viral content (filter for robots)
+            'nextfuckinglevel',        # Amazing tech (filter for robots)
+            'Damnthatsinteresting',   # Viral wow-factor (filter for robots)
+            'funny',                  # Viral funny (filter for robots)
+            'technology',             # Tech news
+            'EngineeringPorn',        # Cool engineering
+            'MechanicalGifs',         # Mechanical content
+            'videos',                 # General videos (robot/AI filtered)
+            'gifs',                   # GIFs (robot filtered)
+            'geek',                   # Geek content (robot filtered)
+            'cyberpunk',              # Futuristic tech (robot filtered)
+            'ScienceAndTechnology',   # Science & tech news
         ]
         
         # Keywords that make something robot-related (substring match is safe)
@@ -78,7 +85,7 @@ class RedditCurator:
     def is_robot_content(self, title: str, subreddit: str) -> bool:
         """Check if content is robot-related"""
         # Robot-specific subreddits always qualify
-        robot_subs = ['shittyrobots', 'robotics', 'battlebots', 'bostondynamics']
+        robot_subs = ['shittyrobots', 'robotics', 'battlebots', 'bostondynamics', 'machinelearning', 'artificial']
         if subreddit.lower() in robot_subs:
             return True
         
@@ -263,7 +270,7 @@ class RedditCurator:
             logger.error(f"Error fetching r/{subreddit}: {e}")
             return []
     
-    def run_scan(self, limit_per_sub: int = 25) -> int:
+    def run_scan(self, limit_per_sub: int = 30) -> int:
         """Run a full Reddit scan"""
         logger.info("🤖 Starting Reddit robot content scan...")
         added = 0
@@ -316,7 +323,7 @@ def main():
     
     if len(sys.argv) > 1:
         if sys.argv[1] == 'scan':
-            limit = int(sys.argv[2]) if len(sys.argv) > 2 else 25
+            limit = int(sys.argv[2]) if len(sys.argv) > 2 else 30
             added = curator.run_scan(limit)
             print(f"\n✅ Added {added} new videos!")
             curator.quick_stats()

@@ -880,6 +880,105 @@
             font-size: 11px;
             margin: 0 2px;
         }
+
+        /* ============================================
+           EMAIL SIGNUP
+           ============================================ */
+        .email-signup-section {
+            display: none;
+            padding: 40px 16px 80px;
+        }
+
+        @media (min-width: 900px) {
+            .email-signup-section {
+                display: block;
+                padding: 48px 24px;
+            }
+        }
+
+        .email-signup-inner {
+            max-width: 700px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, rgba(57,255,20,0.08) 0%, rgba(0,255,136,0.05) 100%);
+            border: 1px solid rgba(57,255,20,0.2);
+            border-radius: 20px;
+            padding: 36px 32px;
+            text-align: center;
+        }
+
+        .email-signup-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .email-signup-text h3 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .email-signup-text p {
+            color: #aaa;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .email-signup-form {
+            display: flex;
+            gap: 10px;
+            max-width: 420px;
+            margin: 0 auto 12px;
+        }
+
+        .email-signup-form input {
+            flex: 1;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: white;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .email-signup-form input:focus {
+            border-color: var(--neon);
+        }
+
+        .email-signup-form input::placeholder {
+            color: #666;
+        }
+
+        .email-signup-form button {
+            background: var(--neon);
+            color: black;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: opacity 0.2s;
+            font-family: inherit;
+        }
+
+        .email-signup-form button:hover {
+            opacity: 0.85;
+        }
+
+        .email-signup-msg {
+            font-size: 13px;
+            min-height: 20px;
+            color: var(--neon);
+        }
+
+        .email-signup-msg.error {
+            color: #ff4444;
+        }
     </style>
 </head>
 <body>
@@ -911,6 +1010,7 @@
         <div class="sort-divider">|</div>
         <div class="category-pill sort-pill active" data-sort="recent">🆕 New</div>
         <div class="category-pill sort-pill" data-sort="popular">👁 Popular</div>
+        <div class="category-pill sort-pill" data-sort="trending">🔥 Trending</div>
         <div class="category-pill sort-pill" data-sort="random">🎲 Random</div>
     </div>
 
@@ -925,6 +1025,22 @@
     <!-- Desktop YouTube Grid -->
     <div class="desktop-grid" id="desktopGrid">
         <!-- Videos will be rendered here -->
+    </div>
+
+    <!-- Email Signup Section (Desktop) -->
+    <div class="email-signup-section" id="emailSignup">
+        <div class="email-signup-inner">
+            <div class="email-signup-icon">🤖</div>
+            <div class="email-signup-text">
+                <h3>Get daily robot fails in your inbox</h3>
+                <p>The best robot content, curated daily. No spam. Just bots.</p>
+            </div>
+            <form class="email-signup-form" onsubmit="subscribeEmail(event)">
+                <input type="email" id="emailInput" placeholder="your@email.com" required>
+                <button type="submit" id="subscribeBtn">Subscribe 🤖</button>
+            </form>
+            <div class="email-signup-msg" id="emailMsg"></div>
+        </div>
     </div>
 
     <!-- Bottom Navigation (Mobile) -->
@@ -1035,7 +1151,7 @@
                 return `
                     <div class="video-card-mobile" data-video-id="${video.id}">
                         <div class="video-wrapper-mobile">
-                            ${thumbnail ? `<img class="thumbnail-mobile" src="${thumbnail}" alt="" onerror="this.style.display='none'">` : ''}
+                            ${thumbnail ? `<img class="thumbnail-mobile" src="${thumbnail}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}
                             <div class="play-icon-mobile" onclick="playVideo('${video.id}', '${video.video_url}')"></div>
                             
                             <div class="video-info-mobile">
@@ -1085,7 +1201,7 @@
                 return `
                     <div class="video-card-desktop" onclick="playVideo('${video.id}', '${video.video_url}')">
                         <div class="thumbnail-container">
-                            ${thumbnail ? `<img class="thumbnail-desktop" src="${thumbnail}" alt="" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 9%22><rect fill=%22%231a1a1a%22 width=%2216%22 height=%229%22/><text x=%228%22 y=%225%22 text-anchor=%22middle%22 fill=%22%23333%22 font-size=%222%22>🤖</text></svg>'">` : ''}
+                            ${thumbnail ? `<img class="thumbnail-desktop" src="${thumbnail}" alt="" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 9%22><rect fill=%22%231a1a1a%22 width=%2216%22 height=%229%22/><text x=%228%22 y=%225%22 text-anchor=%22middle%22 fill=%22%23333%22 font-size=%222%22>🤖</text></svg>'">` : ''}
                             <span class="category-badge">${getCategoryEmoji(video.category)} ${video.category}</span>
                         </div>
                         <div class="video-details">
@@ -1490,6 +1606,42 @@
 
         // Initialize
         fetchVideos();
+
+        // Email subscribe
+        async function subscribeEmail(e) {
+            e.preventDefault();
+            const email = document.getElementById('emailInput').value.trim();
+            const btn = document.getElementById('subscribeBtn');
+            const msg = document.getElementById('emailMsg');
+
+            btn.disabled = true;
+            btn.textContent = 'Subscribing...';
+            msg.textContent = '';
+            msg.className = 'email-signup-msg';
+
+            try {
+                const res = await fetch('/api/subscribe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    msg.textContent = data.message || '✅ Subscribed! Daily robot content incoming.';
+                    document.getElementById('emailInput').value = '';
+                } else {
+                    msg.textContent = data.error || 'Something went wrong.';
+                    msg.className = 'email-signup-msg error';
+                }
+            } catch (err) {
+                msg.textContent = 'Failed to subscribe. Try again later.';
+                msg.className = 'email-signup-msg error';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Subscribe 🤖';
+            }
+        }
     </script>
 </body>
 </html>
