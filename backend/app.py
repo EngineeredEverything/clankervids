@@ -227,6 +227,20 @@ def subscribe_email():
         conn.commit()
         conn.close()
 
+        # Send welcome email (non-blocking — best effort)
+        try:
+            import sys as _sys
+            import importlib.util as _ilu
+            _spec = _ilu.spec_from_file_location(
+                'email_service',
+                os.path.join(os.path.dirname(os.path.dirname(__file__)), 'email_service.py')
+            )
+            _em = _ilu.module_from_spec(_spec)
+            _spec.loader.exec_module(_em)
+            _em.send_welcome(email)
+        except Exception as _e:
+            print(f"Welcome email error (non-fatal): {_e}")
+
         return jsonify({'success': True, 'message': 'Subscribed! Daily robot content incoming. 🤖'})
 
     except Exception as e:
