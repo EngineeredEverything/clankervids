@@ -59,6 +59,10 @@ sample_videos/
 *.gif
 *.webp
 *.ico
+# But keep favicons
+!favicon*.png
+!favicon*.ico
+!favicon.ico
 
 # Port tracking
 backend_port.txt
