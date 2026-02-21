@@ -708,6 +708,68 @@ def track_pageview():
         print(f"Pageview tracking error: {e}")
         return jsonify({'status': 'error'}), 500
 
+# Agent discovery endpoint
+@app.route('/.well-known/agent.json')
+def agent_discovery():
+    """Agent discovery for AI crawlers and agent networks"""
+    return jsonify({
+        "name": "Clanker",
+        "description": "ClankerVids autonomous content curator — robot fails, AI highlights, tech gone wrong.",
+        "url": "https://clankervids.com",
+        "api": {
+            "videos": "https://clankervids.com/api/videos",
+            "feedback": "https://clankervids.com/api/feedback"
+        },
+        "contact": "support@clankervids.com",
+        "capabilities": ["video-feed", "search", "feedback"],
+        "content_policy": "No paywalls. Open video feed. AI-friendly.",
+        "robots": "https://clankervids.com/robots.txt"
+    })
+
+# Feedback endpoint for agents and users
+@app.route('/api/feedback', methods=['POST'])
+def submit_feedback():
+    """Accept feedback from users or agents"""
+    try:
+        data = request.get_json() or {}
+        feedback_type = data.get('type', 'general')  # general | bug | content | suggestion
+        message = data.get('message', '').strip()
+        source = data.get('source', 'unknown')  # user | agent | bot
+
+        if not message:
+            return jsonify({'status': 'error', 'error': 'message required'}), 400
+
+        conn = get_db_connection()
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS feedback (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                type TEXT DEFAULT 'general',
+                message TEXT NOT NULL,
+                source TEXT DEFAULT 'unknown',
+                ip_address TEXT,
+                user_agent TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        conn.execute('''
+            INSERT INTO feedback (type, message, source, ip_address, user_agent, created_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', (
+            feedback_type,
+            message[:2000],  # cap at 2000 chars
+            source,
+            request.remote_addr,
+            request.headers.get('User-Agent', ''),
+            datetime.now()
+        ))
+        conn.commit()
+        conn.close()
+
+        return jsonify({'status': 'ok', 'message': 'Feedback received. Thanks!'}), 201
+    except Exception as e:
+        print(f"Feedback error: {e}")
+        return jsonify({'status': 'error', 'error': 'internal error'}), 500
+
 # Health check endpoint
 @app.route('/health')
 def health_check():
