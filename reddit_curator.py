@@ -132,6 +132,23 @@ class RedditCurator:
                 return match.group(1)
         return None
     
+    def best_youtube_thumbnail(self, youtube_id: str) -> str:
+        """Return the highest-res YouTube thumbnail that actually exists."""
+        candidates = [
+            f"https://i.ytimg.com/vi/{youtube_id}/maxresdefault.jpg",
+            f"https://i.ytimg.com/vi/{youtube_id}/sddefault.jpg",
+            f"https://i.ytimg.com/vi/{youtube_id}/hqdefault.jpg",
+        ]
+        for url in candidates:
+            try:
+                r = requests.head(url, timeout=6, allow_redirects=True)
+                content_length = int(r.headers.get('Content-Length', 0))
+                if r.status_code == 200 and content_length > 5000:
+                    return url
+            except Exception:
+                continue
+        return f"https://i.ytimg.com/vi/{youtube_id}/hqdefault.jpg"
+
     def video_exists(self, video_url: str, youtube_id: str = None, title: str = None) -> bool:
         """Check if video already exists by youtube_id, URL, or similar title"""
         try:
@@ -187,7 +204,8 @@ class RedditCurator:
             
             if youtube_id:
                 video_url = f"https://www.youtube.com/watch?v={youtube_id}"
-                thumbnail_url = f"https://i.ytimg.com/vi/{youtube_id}/hqdefault.jpg"
+                # Prefer maxresdefault (1280px); fall back through lower resolutions
+                thumbnail_url = self.best_youtube_thumbnail(youtube_id)
             elif 'v.redd.it' in url:
                 video_url = url
                 # Reddit videos - use preview image if available
