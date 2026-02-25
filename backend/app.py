@@ -57,7 +57,7 @@ def get_videos():
             seven_days_ago = (datetime.now() - timedelta(days=7)).isoformat()
             where += " AND created_at >= ?"
             params.append(seven_days_ago)
-            order = " ORDER BY (clanks + system_errors + views) DESC"
+            order = " ORDER BY (clanks * 10 + system_errors * 5 + views) DESC"
         else:
             order = " ORDER BY created_at DESC"
 

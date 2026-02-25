@@ -1089,9 +1089,9 @@
         <div class="category-pill" data-category="highlights">✨ Highlights</div>
         <div class="category-pill" data-category="battles">⚔️ Battles</div>
         <div class="sort-divider">|</div>
-        <div class="category-pill sort-pill active" data-sort="recent">🆕 New</div>
+        <div class="category-pill sort-pill" data-sort="recent">🆕 New</div>
         <div class="category-pill sort-pill" data-sort="popular">👁 Popular</div>
-        <div class="category-pill sort-pill" data-sort="trending">🔥 Trending</div>
+        <div class="category-pill sort-pill active" data-sort="trending">🔥 Trending</div>
         <div class="category-pill sort-pill" data-sort="random">🎲 Random</div>
     </div>
 
@@ -1195,7 +1195,7 @@
         }
 
         // Fetch videos
-        async function fetchVideos(category = 'all', sort = 'recent') {
+        async function fetchVideos(category = 'all', sort = 'trending') {
             try {
                 let url = `/api/videos?sort=${sort}`;
                 if (category !== 'all') {
