@@ -31,62 +31,112 @@ class RedditCurator:
         
         # Robot-focused subreddits
         self.subreddits = [
+            # --- Core robot subs (always qualify, no keyword filter needed) ---
             'shittyrobots',           # Classic robot fails
             'robotics',               # Serious robotics
             'Battlebots',             # Robot battles
             'BostonDynamics',         # Boston Dynamics content
-            'MachineLearning',        # AI/ML
-            'artificial',             # Artificial intelligence
-            'Futurology',             # Tech future
-            'interestingasfuck',      # Viral content (filter for robots)
-            'nextfuckinglevel',        # Amazing tech (filter for robots)
-            'Damnthatsinteresting',   # Viral wow-factor (filter for robots)
-            'funny',                  # Viral funny (filter for robots)
+            'MechanicalGifs',         # Mechanical / robot GIFs
+
+            # --- Humanoid & AI robot subs ---
+            'HumanoidRobots',         # Dedicated humanoid sub
+            'singularity',            # Huge AI/robotics viral community
+            'ArtificialIntelligence', # General AI demos & news
+            'MachineLearning',        # AI/ML research with demos
+            'artificial',             # Artificial intelligence community
+            'ChatGPT',                # AI moments & viral demos (filtered)
+            'OpenAI',                 # OpenAI product demos
+
+            # --- Drone subs ---
+            'drones',                 # General drone footage, fails, highlights
+            'fpv',                    # FPV racing, crashes, stunts
+            'Multicopter',            # Drone hobby community
+            'diydrones',              # DIY drone builds & crashes
+
+            # --- Autonomous vehicles ---
+            'autonomousvehicles',     # Self-driving robots & cars
+            'SelfDrivingCars',        # Tesla FSD, Waymo, etc.
+
+            # --- Viral / crossover subs (filtered by keyword) ---
+            'Futurology',             # Tech future — lots of robot content
+            'interestingasfuck',      # Viral wow-factor
+            'nextfuckinglevel',       # Amazing tech
+            'Damnthatsinteresting',   # Viral highlights
+            'Whatcouldgowrong',       # Fails & disasters (great for robot fails)
+            'oddlysatisfying',        # Robot precision & highlights
             'technology',             # Tech news
-            'EngineeringPorn',        # Cool engineering
-            'MechanicalGifs',         # Mechanical content
+            'EngineeringPorn',        # Cool engineering & industrial robots
+            'specializedtools',       # Industrial machinery highlights
             'videos',                 # General videos (robot/AI filtered)
             'gifs',                   # GIFs (robot filtered)
-            'geek',                   # Geek content (robot filtered)
-            'cyberpunk',              # Futuristic tech (robot filtered)
+            'geek',                   # Geek content
+            'cyberpunk',              # Futuristic tech
             'ScienceAndTechnology',   # Science & tech news
+            'funny',                  # Viral funny (robot filtered)
         ]
-        
+
+        # Subreddits that ALWAYS qualify (no keyword check needed)
+        self.always_qualify_subs = {
+            'shittyrobots', 'robotics', 'battlebots', 'bostondynamics',
+            'mechanicalgifs', 'humanoidrobots', 'drones', 'fpv',
+            'multicopter', 'diydrones',
+        }
+
         # Keywords that make something robot-related (substring match is safe)
         self.robot_keywords_substring = [
+            # Core robot terms
             'robot', 'robotic', 'humanoid', 'droid',
-            'boston dynamics', 'tesla bot',
-            'unitree', 'quadruped',
+            'battlebots', 'battlebot',
+            # Brands & companies
+            'boston dynamics', 'tesla bot', 'tesla optimus',
+            'unitree', 'agility robotics', '1x technologies',
+            'figure robot', 'ameca', 'sanctuary ai',
+            'apptronik', 'physical intelligence',
+            # Robot types
+            'quadruped', 'exoskeleton', 'bionic', 'cyborg',
+            'robot arm', 'robot dog', 'robot hand',
+            'warehouse robot', 'delivery robot', 'surgical robot',
+            'industrial robot', 'cobots', 'cobot',
+            # Drone terms
+            'quadcopter', 'multicopter', 'uav', 'unmanned aerial',
+            'drone swarm', 'drone show', 'drone fail',
+            # AI terms
             'artificial intelligence', 'machine learning',
             'self-driving', 'automation', 'automated',
-            'servo', 'actuator', 'cyborg',
-            'chatgpt', 'exoskeleton', 'bionic',
-            'battlebots', 'battlebot',
+            'servo', 'actuator', 'chatgpt',
         ]
-        
+
         # Keywords that need word-boundary matching (too generic as substrings)
         self.robot_keywords_exact = [
             'ai', 'drone', 'drones', 'gpt', 'neural', 'android',
-            'autonomous', 'mechanical',
+            'autonomous', 'mechanical', 'fpv', 'uav',
         ]
-        
+
         # Brand/product names that are too ambiguous alone — require a second
-        # robot-related word nearby to count (e.g. "atlas robot" yes, "atlas mountains" no)
-        self.contextual_keywords = ['atlas', 'spot', 'optimus', 'figure', 'digit']
+        # robot-related word nearby to count
+        self.contextual_keywords = [
+            'atlas', 'spot', 'optimus', 'figure', 'digit',
+            'neo', 'ameca', 'agility', 'nao', 'pepper',
+        ]
         self.context_helpers = [
             'robot', 'humanoid', 'boston dynamics', 'unitree', 'tesla',
-            'walking', 'bipedal', 'legged', 'autonomous',
+            'walking', 'bipedal', 'legged', 'autonomous', 'ai', 'drone',
+            'robotic', 'arm', 'manipulation',
         ]
-        
+
         # Fail keywords for categorization
-        self.fail_keywords = ['fail', 'fails', 'falling', 'crash', 'oops', 'malfunction', 'broken', 'glitch', 'shitty']
+        self.fail_keywords = [
+            'fail', 'fails', 'falling', 'crash', 'crashed', 'oops',
+            'malfunction', 'broken', 'glitch', 'shitty', 'disaster',
+            'explosion', 'explode', 'breakdown', 'error', 'gone wrong',
+            'dropped', 'tipped', 'fell', 'stumble',
+        ]
         self.battle_keywords = ['battle', 'fight', 'vs', 'combat', 'destroy', 'battlebots']
         
     def is_robot_content(self, title: str, subreddit: str) -> bool:
         """Check if content is robot-related"""
-        # Robot-specific subreddits always qualify
-        robot_subs = ['shittyrobots', 'robotics', 'battlebots', 'bostondynamics', 'machinelearning', 'artificial']
-        if subreddit.lower() in robot_subs:
+        # Dedicated subs always qualify — no keyword filter needed
+        if subreddit.lower() in self.always_qualify_subs:
             return True
         
         title_lower = title.lower()
@@ -112,11 +162,16 @@ class RedditCurator:
         """Categorize the video"""
         title_lower = title.lower()
         sub_lower = subreddit.lower()
-        
-        if sub_lower == 'shittyrobots' or any(kw in title_lower for kw in self.fail_keywords):
+
+        # Explicit fail subs / fail keywords
+        if sub_lower in ('shittyrobots', 'whatcouldgowrong') or \
+                any(kw in title_lower for kw in self.fail_keywords):
             return 'fails'
-        elif sub_lower == 'battlebots' or any(kw in title_lower for kw in self.battle_keywords):
+        # Battle subs / battle keywords
+        elif sub_lower == 'battlebots' or \
+                any(kw in title_lower for kw in self.battle_keywords):
             return 'battles'
+        # Drone subs without fail signals → highlights
         else:
             return 'highlights'
     
