@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ClankerVids - Robot Fails, AI Highlights & Epic Bot Moments</title>
+    <title>ClankerVids — Real Robot Fails, Highlights &amp; Battles</title>
     
     <!-- SEO Meta Tags -->
-    <meta name="description" content="Watch the best robot fails, AI highlights, and epic bot moments. ClankerVids curates viral robot content - Boston Dynamics, BattleBots, shitty robots, and more. Updated daily.">
+    <meta name="description" content="The internet's home for real robot moments. Fails, highlights, and battles — no AI renders, no CGI. Just robots.">
     <meta name="keywords" content="robot fails, robot videos, AI highlights, Boston Dynamics, BattleBots, robot compilation, funny robots, robot accidents, automation fails, tech fails">
     <meta name="author" content="ClankerVids">
     <meta name="robots" content="index, follow">
@@ -15,16 +15,16 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://clankervids.com/">
-    <meta property="og:title" content="ClankerVids - Robot Fails & AI Highlights">
-    <meta property="og:description" content="Watch the best robot fails, AI highlights, and epic bot moments. Updated daily with viral robot content.">
+    <meta property="og:title" content="ClankerVids — Real Robot Fails, Highlights &amp; Battles">
+    <meta property="og:description" content="The internet's home for real robot moments. Fails, highlights, and battles — no AI renders, no CGI. Just robots.">
     <meta property="og:image" content="https://clankervids-cdn.b-cdn.net/assets/clankervids_logo.png">
     <meta property="og:site_name" content="ClankerVids">
     
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://clankervids.com/">
-    <meta name="twitter:title" content="ClankerVids - Robot Fails & AI Highlights">
-    <meta name="twitter:description" content="Watch the best robot fails, AI highlights, and epic bot moments. Updated daily.">
+    <meta name="twitter:title" content="ClankerVids — Real Robot Fails, Highlights &amp; Battles">
+    <meta name="twitter:description" content="The internet's home for real robot moments. Fails, highlights, and battles — no AI renders, no CGI.">
     <meta name="twitter:image" content="https://clankervids-cdn.b-cdn.net/assets/clankervids_logo.png">
     
     <!-- Structured Data -->
@@ -34,11 +34,29 @@
       "@type": "WebSite",
       "name": "ClankerVids",
       "url": "https://clankervids.com",
-      "description": "Watch the best robot fails, AI highlights, and epic bot moments",
+      "description": "The internet's home for real robot moments. Fails, highlights, and battles — no AI renders, no CGI. Just robots.",
       "potentialAction": {
         "@type": "SearchAction",
         "target": "https://clankervids.com/?search={search_term_string}",
         "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "ClankerVids — Real Robot Fails, Highlights & Battles",
+      "url": "https://clankervids.com",
+      "description": "Curated collection of real robot video moments — fails, highlights, and battle footage.",
+      "about": {
+        "@type": "Thing",
+        "name": "Robotics Videos"
+      },
+      "provider": {
+        "@type": "Organization",
+        "name": "ClankerVids",
+        "url": "https://clankervids.com"
       }
     }
     </script>
@@ -184,9 +202,11 @@
             left: 0;
             right: 0;
             display: flex;
+            flex-wrap: nowrap;
             gap: 8px;
             padding: 12px 16px;
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
             z-index: 99;
             background: var(--bg-dark);
@@ -197,7 +217,35 @@
             display: none;
         }
 
-        .category-pill {
+        /* Filter bar scroll - no wrap */
+        .filter-bar {
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            -webkit-overflow-scrolling: touch;
+        }
+        .filter-bar::-webkit-scrollbar { display: none; }
+        .filter-bar > * { flex-shrink: 0; }
+
+        .filter-divider {
+            width: 1px;
+            background: #333;
+            margin: 4px 4px;
+            flex-shrink: 0;
+        }
+
+        /* Submit button header style */
+        .submit-btn-header {
+            background: var(--neon) !important;
+            color: #000 !important;
+            font-weight: 700 !important;
+        }
+
+        /* filter-shrink-fix */ .category-pill {
+            flex-shrink: 0;
             flex-shrink: 0;
             padding: 8px 14px;
             border-radius: 8px;
@@ -250,8 +298,10 @@
             }
 
             .categories {
-                background: transparent;
-                border-bottom: none;
+                background: rgba(15,15,15,0.97);
+                border-bottom: 1px solid rgba(255,255,255,0.07);
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
             }
 
             .desktop-grid {
@@ -264,6 +314,7 @@
                 overflow-y: scroll;
                 scroll-snap-type: y mandatory;
                 scrollbar-width: none;
+                padding-top: 106px;
             }
 
             .mobile-feed::-webkit-scrollbar {
@@ -271,7 +322,7 @@
             }
 
             .video-card-mobile {
-                height: 100vh;
+                height: calc(100vh - 106px);
                 width: 100%;
                 scroll-snap-align: start;
                 position: relative;
@@ -1078,7 +1129,8 @@
         <div class="header-actions">
             <button class="header-btn" onclick="playRandomVideo()" title="Random Video">🎲</button>
             <button class="header-btn" onclick="refreshFeed()" title="Refresh">🔄</button>
-            <button class="header-btn" onclick="window.location.href='/upload.html'" title="Upload">⬆️ Upload</button>
+            <button class="header-btn submit-btn-header" onclick="window.location.href='/submit'" title="Submit a Clip">📹 Submit</button>
+            <button class="header-btn about-btn-header" onclick="window.location.href='/about'" title="About & Sponsorship">ℹ️</button>
         </div>
     </header>
 
@@ -1088,10 +1140,16 @@
         <div class="category-pill" data-category="fails">💥 Fails</div>
         <div class="category-pill" data-category="highlights">✨ Highlights</div>
         <div class="category-pill" data-category="battles">⚔️ Battles</div>
+        <div class="filter-divider"></div>
+        <div class="category-pill robot-type-pill" data-robot-type="humanoid">🦾 Humanoid</div>
+        <div class="category-pill robot-type-pill" data-robot-type="drone">🚁 Drones</div>
+        <div class="category-pill robot-type-pill" data-robot-type="robot_dog">🐕 Robot Dogs</div>
+        <div class="category-pill robot-type-pill" data-robot-type="industrial">🏭 Industrial</div>
+        <div class="category-pill robot-type-pill" data-robot-type="combat">⚔️ Combat</div>
         <div class="sort-divider">|</div>
-        <div class="category-pill sort-pill" data-sort="recent">🆕 New</div>
+        <div class="category-pill sort-pill active" data-sort="recent">🆕 New</div>
         <div class="category-pill sort-pill" data-sort="popular">👁 Popular</div>
-        <div class="category-pill sort-pill active" data-sort="trending">🔥 Trending</div>
+        <div class="category-pill sort-pill" data-sort="trending">🔥 Trending</div>
         <div class="category-pill sort-pill" data-sort="random">🎲 Random</div>
     </div>
 
@@ -1195,11 +1253,14 @@
         }
 
         // Fetch videos
-        async function fetchVideos(category = 'all', sort = 'trending') {
+        async function fetchVideos(category = 'all', sort = 'recent') {
             try {
                 let url = `/api/videos?sort=${sort}`;
                 if (category !== 'all') {
                     url += `&category=${category}`;
+                }
+                if (typeof currentRobotType !== 'undefined' && currentRobotType) {
+                    url += `&robot_type=${currentRobotType}`;
                 }
                 
                 const response = await fetch(url);
@@ -1623,6 +1684,24 @@
         }
 
         // Category selection
+        // Robot type filter
+        let currentRobotType = '';
+        document.querySelectorAll('.robot-type-pill').forEach(pill => {
+            pill.addEventListener('click', () => {
+                const rt = pill.dataset.robotType;
+                if (currentRobotType === rt) {
+                    // Deselect
+                    currentRobotType = '';
+                    pill.classList.remove('active');
+                } else {
+                    currentRobotType = rt;
+                    document.querySelectorAll('.robot-type-pill').forEach(p => p.classList.remove('active'));
+                    pill.classList.add('active');
+                }
+                fetchVideos(currentCategory, currentSort);
+            });
+        });
+
         document.querySelectorAll('.category-pill[data-category]').forEach(pill => {
             pill.addEventListener('click', () => {
                 document.querySelectorAll('.category-pill[data-category]').forEach(p => p.classList.remove('active'));

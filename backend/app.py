@@ -35,6 +35,7 @@ def get_videos():
         category = request.args.get('category', 'all')
         sort_by = request.args.get('sort', 'recent')
         limit = request.args.get('limit', None)
+        robot_type = request.args.get('robot_type', '')
 
         conn = get_db_connection()
 
@@ -44,6 +45,9 @@ def get_videos():
         if category != 'all':
             where += " AND category = ?"
             params.append(category)
+        if robot_type:
+            where += " AND robot_type = ?"
+            params.append(robot_type)
 
         # Add sorting
         if sort_by == 'recent':
@@ -53,11 +57,15 @@ def get_videos():
         elif sort_by == 'clanks':
             order = " ORDER BY clanks DESC"
         elif sort_by == 'trending':
-            # Trending: (reactions + views) created in last 7 days, ranked by engagement
-            seven_days_ago = (datetime.now() - timedelta(days=7)).isoformat()
-            where += " AND created_at >= ?"
-            params.append(seven_days_ago)
-            order = " ORDER BY (clanks * 10 + system_errors * 5 + views) DESC"
+            # Trending: blend engagement + recency so new videos surface even with 0 reactions
+            # Score = engagement + recency boost (videos <24h get +500, <72h get +200)
+            order = (" ORDER BY ("
+                     "clanks * 10 + system_errors * 5 + views + "
+                     "CASE WHEN created_at >= datetime('now', '-1 day') THEN 500 "
+                     "     WHEN created_at >= datetime('now', '-3 days') THEN 200 "
+                     "     WHEN created_at >= datetime('now', '-7 days') THEN 50 "
+                     "     ELSE 0 END"
+                     ") DESC")
         else:
             order = " ORDER BY created_at DESC"
 
@@ -92,7 +100,9 @@ def get_videos():
                 'hashtags': None,
                 'view_count': row['views'],
                 'upload_date': row['created_at'],
-                'youtube_id': row['youtube_id'] if 'youtube_id' in row.keys() else None
+                'youtube_id': row['youtube_id'] if 'youtube_id' in row.keys() else None,
+                'robot_type': row['robot_type'] if 'robot_type' in row.keys() else None,
+                'rights_status': row['rights_status'] if 'rights_status' in row.keys() else 'scrape'
             }
             videos.append(video)
 
@@ -616,6 +626,284 @@ def submit_feedback():
     except Exception as e:
         print(f"Feedback error: {e}")
         return jsonify({'status': 'error', 'error': 'internal error'}), 500
+
+
+
+# ============================================================
+# UGC SUBMISSION SYSTEM
+# ============================================================
+
+def detect_category_from_title(title):
+    """Auto-detect category from title keywords."""
+    t = (title or "").lower()
+    if any(k in t for k in ["fail", "crash", "error", "malfunction", "broke", "broken", "falls", "fell", "trips", "trip", "stumble", "oops"]):
+        return "fails"
+    if any(k in t for k in ["battle", "fight", "combat", "vs", "versus", "war", "arena", "competition", "tournament"]):
+        return "battles"
+    if any(k in t for k in ["highlight", "amazing", "awesome", "epic", "impressive", "incredible", "success", "achievement"]):
+        return "highlights"
+    return "highlights"  # default
+
+
+@app.route('/api/submit', methods=['POST'])
+def submit_ugc():
+    """Accept UGC video submissions."""
+    try:
+        data = request.get_json() or {}
+        title = (data.get('title') or '').strip()
+        video_url = (data.get('video_url') or '').strip()
+        source_url = (data.get('source_url') or '').strip()
+        submitter_name = (data.get('submitter_name') or '').strip()
+        submitter_email = (data.get('submitter_email') or '').strip()
+        rights_confirmation = data.get('rights_confirmation', False)
+        description = (data.get('description') or '').strip()
+
+        # Validation
+        errors = []
+        if not title:
+            errors.append('Title is required')
+        elif len(title) < 5:
+            errors.append('Title must be at least 5 characters')
+        if not video_url:
+            errors.append('Video URL is required')
+        if not submitter_name:
+            errors.append('Your name is required')
+        if not submitter_email or not re.match(r'^[^@]+@[^@]+\.[^@]+$', submitter_email):
+            errors.append('Valid email address is required')
+        if not rights_confirmation:
+            errors.append('You must confirm you have rights to submit this content')
+
+        if errors:
+            return jsonify({'success': False, 'errors': errors}), 400
+
+        # Auto-detect category
+        category = detect_category_from_title(title)
+
+        import uuid
+        video_id = str(uuid.uuid4())
+
+        conn = get_db_connection()
+        conn.execute('''
+            INSERT INTO videos (
+                id, title, description, creator, category, status,
+                rights_status, source_url, source_credit,
+                views, clanks, epic_bots, system_errors, comments, shares,
+                created_at
+            ) VALUES (?, ?, ?, ?, ?, 'pending', 'ugc_pending', ?, ?, 0, 0, 0, 0, 0, 0, ?)
+        ''', (
+            video_id,
+            title[:500],
+            description[:2000],
+            submitter_name,
+            category,
+            video_url,
+            submitter_name,
+            datetime.now().isoformat()
+        ))
+
+        # Also store submitter email in a UGC metadata table
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS ugc_submissions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                video_id TEXT NOT NULL,
+                submitter_name TEXT,
+                submitter_email TEXT,
+                video_url TEXT,
+                source_url TEXT,
+                rights_confirmed BOOLEAN DEFAULT 0,
+                submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                status TEXT DEFAULT 'pending'
+            )
+        ''')
+        conn.execute('''
+            INSERT INTO ugc_submissions
+            (video_id, submitter_name, submitter_email, video_url, source_url, rights_confirmed)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', (video_id, submitter_name, submitter_email, video_url, source_url, 1 if rights_confirmation else 0))
+
+        conn.commit()
+        conn.close()
+
+        return jsonify({
+            'success': True,
+            'message': 'Thanks! Your clip has been submitted for review. We\'ll check it out within 24-48 hours.',
+            'submission_id': video_id
+        }), 201
+
+    except Exception as e:
+        print(f"UGC submit error: {e}")
+        return jsonify({'success': False, 'error': 'Internal error. Please try again.'}), 500
+
+
+@app.route('/api/submissions', methods=['GET'])
+def get_submissions():
+    """Return pending UGC submissions for admin review."""
+    try:
+        conn = get_db_connection()
+        rows = conn.execute('''
+            SELECT v.id, v.title, v.description, v.creator, v.category,
+                   v.source_url, v.created_at,
+                   u.submitter_email, u.video_url, u.source_url as submitted_source,
+                   u.rights_confirmed, u.submitted_at
+            FROM videos v
+            LEFT JOIN ugc_submissions u ON v.id = u.video_id
+            WHERE v.status = 'pending' AND v.rights_status = 'ugc_pending'
+            ORDER BY v.created_at DESC
+            LIMIT 100
+        ''').fetchall()
+        conn.close()
+
+        submissions = []
+        for row in rows:
+            submissions.append({
+                'id': row[0],
+                'title': row[1],
+                'description': row[2],
+                'submitter_name': row[3],
+                'category': row[4],
+                'source_url': row[5],
+                'created_at': row[6],
+                'submitter_email': row[7],
+                'video_url': row[8],
+                'rights_confirmed': bool(row[10]),
+                'submitted_at': row[11]
+            })
+
+        return jsonify({'submissions': submissions, 'count': len(submissions)})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+# ============================================================
+# SPONSORSHIP / ABOUT
+# ============================================================
+
+@app.route('/api/sponsorship-inquiry', methods=['POST'])
+def sponsorship_inquiry():
+    """Accept sponsorship inquiry and save to DB."""
+    try:
+        data = request.get_json() or {}
+        company_name = (data.get('company_name') or '').strip()
+        contact_email = (data.get('contact_email') or '').strip()
+        budget_range = (data.get('budget_range') or '').strip()
+        message = (data.get('message') or '').strip()
+
+        errors = []
+        if not company_name:
+            errors.append('Company name is required')
+        if not contact_email or not re.match(r'^[^@]+@[^@]+\.[^@]+$', contact_email):
+            errors.append('Valid contact email is required')
+        if not budget_range:
+            errors.append('Budget range is required')
+
+        if errors:
+            return jsonify({'success': False, 'errors': errors}), 400
+
+        conn = get_db_connection()
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS sponsorship_inquiries (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_name TEXT NOT NULL,
+                contact_email TEXT NOT NULL,
+                budget_range TEXT,
+                message TEXT,
+                ip_address TEXT,
+                submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                status TEXT DEFAULT 'new'
+            )
+        ''')
+        conn.execute('''
+            INSERT INTO sponsorship_inquiries
+            (company_name, contact_email, budget_range, message, ip_address)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (
+            company_name[:300],
+            contact_email[:300],
+            budget_range,
+            message[:5000],
+            request.remote_addr
+        ))
+        conn.commit()
+        conn.close()
+
+        return jsonify({
+            'success': True,
+            'message': f"Thanks, {company_name}! We've received your inquiry and will be in touch at {contact_email} within 2-3 business days."
+        }), 201
+
+    except Exception as e:
+        print(f"Sponsorship inquiry error: {e}")
+        return jsonify({'success': False, 'error': 'Internal error. Please try again.'}), 500
+
+
+@app.route('/submit')
+def submit_page():
+    """Serve the submit page."""
+    submit_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'submit.html')
+    if os.path.isfile(submit_path):
+        with open(submit_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        return Response(content, mimetype='text/html')
+    return jsonify({'error': 'Submit page not found'}), 404
+
+
+@app.route('/about')
+def about_page():
+    """Serve the about page."""
+    about_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'about.html')
+    if os.path.isfile(about_path):
+        with open(about_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        return Response(content, mimetype='text/html')
+    return jsonify({'error': 'About page not found'}), 404
+
+
+# ============================================================
+# ENHANCED VIDEO API (with robot_type filter)
+# ============================================================
+
+@app.route('/api/videos/by-type', methods=['GET'])
+def get_videos_by_type():
+    """Get videos filtered by robot_type."""
+    try:
+        robot_type = request.args.get('robot_type', '')
+        sort_by = request.args.get('sort', 'trending')
+        limit = request.args.get('limit', None)
+
+        conn = get_db_connection()
+        where = "WHERE status = 'active'"
+        params = []
+
+        if robot_type:
+            where += " AND robot_type = ?"
+            params.append(robot_type)
+
+        if sort_by == 'recent':
+            order = " ORDER BY created_at DESC"
+        elif sort_by == 'popular':
+            order = " ORDER BY views DESC"
+        else:
+            order = " ORDER BY (clanks * 10 + system_errors * 5 + views) DESC"
+
+        query = f"SELECT * FROM videos {where}{order}"
+        if limit:
+            query += f" LIMIT {int(limit)}"
+
+        cursor = conn.execute(query, params)
+        videos = []
+        for row in cursor.fetchall():
+            video = dict(row)
+            video['clank_count'] = video.get('clanks', 0)
+            video['epic_count'] = video.get('epic_bots', 0)
+            video['fail_count'] = video.get('system_errors', 0)
+            video['view_count'] = video.get('views', 0)
+            videos.append(video)
+
+        conn.close()
+        return jsonify(videos)
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e), 'videos': []}), 500
 
 
 if __name__ == '__main__':
