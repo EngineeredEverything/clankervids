@@ -1186,6 +1186,9 @@
         <!-- Videos will be rendered here -->
     </div>
 
+    <!-- Infinite scroll sentinel -->
+    <div id="loadMoreSentinel" style="height:1px;"></div>
+
     <!-- Email Signup Section (Desktop) -->
     <div class="email-signup-section" id="emailSignup">
         <div class="email-signup-inner">
@@ -1253,28 +1256,60 @@
         }
 
         // Fetch videos
+        let currentPage = 1;
+        let isLoadingMore = false;
+        let hasMoreVideos = true;
+        const PER_PAGE = 50;
+
         async function fetchVideos(category = 'all', sort = 'recent') {
+            currentPage = 1;
+            hasMoreVideos = true;
+            videos = [];
             try {
-                let url = `/api/videos?sort=${sort}`;
-                if (category !== 'all') {
-                    url += `&category=${category}`;
-                }
-                if (typeof currentRobotType !== 'undefined' && currentRobotType) {
-                    url += `&robot_type=${currentRobotType}`;
-                }
-                
+                let url = `/api/videos?sort=${sort}&page=1&per_page=${PER_PAGE}`;
+                if (category !== 'all') url += `&category=${category}`;
+                if (typeof currentRobotType !== 'undefined' && currentRobotType) url += `&robot_type=${currentRobotType}`;
                 const response = await fetch(url);
-                videos = await response.json();
-                
-                if (sort === 'random') {
-                    videos = shuffleArray(videos);
-                }
-                
+                const data = await response.json();
+                videos = Array.isArray(data) ? data : (data.videos || []);
+                if (sort === 'random') videos = shuffleArray(videos);
+                if (videos.length < PER_PAGE) hasMoreVideos = false;
                 renderFeed();
+                setupLoadMoreObserver();
             } catch (error) {
                 console.error('Error loading videos:', error);
                 showError();
             }
+        }
+
+        async function loadMoreVideos() {
+            if (isLoadingMore || !hasMoreVideos) return;
+            isLoadingMore = true;
+            currentPage++;
+            try {
+                let url = `/api/videos?sort=${currentSort}&page=${currentPage}&per_page=${PER_PAGE}`;
+                if (currentCategory !== 'all') url += `&category=${currentCategory}`;
+                if (typeof currentRobotType !== 'undefined' && currentRobotType) url += `&robot_type=${currentRobotType}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                const newVids = Array.isArray(data) ? data : (data.videos || []);
+                if (newVids.length < PER_PAGE) hasMoreVideos = false;
+                if (newVids.length > 0) {
+                    videos = videos.concat(newVids);
+                    renderFeed();
+                }
+            } catch (e) { console.error('Load more error:', e); }
+            isLoadingMore = false;
+        }
+
+        function setupLoadMoreObserver() {
+            if (window._loadMoreObserver) window._loadMoreObserver.disconnect();
+            const sentinel = document.getElementById('loadMoreSentinel');
+            if (!sentinel) return;
+            window._loadMoreObserver = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting) loadMoreVideos();
+            }, { rootMargin: '300px' });
+            window._loadMoreObserver.observe(sentinel);
         }
 
         // Shuffle array
@@ -1354,16 +1389,17 @@
                 return;
             }
 
-            container.innerHTML = videos.map((video) => {
+            container.innerHTML = videos.map((video, idx) => {
                 const youtubeId = extractYouTubeId(video.video_url);
                 const thumbnail = video.thumbnail_url || (youtubeId ? `https://i.ytimg.com/vi/${youtubeId}/mqdefault.jpg` : '');
                 const views = video.views || video.view_count || 0;
                 const timeAgo = getTimeAgo(video.created_at);
+                const isAboveFold = idx < 4;
                 
                 return `
                     <div class="video-card-desktop" onclick="playVideo('${video.id}', '${video.video_url}')">
                         <div class="thumbnail-container">
-                            ${thumbnail ? `<img class="thumbnail-desktop" src="${thumbnail}" alt="" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 9%22><rect fill=%22%231a1a1a%22 width=%2216%22 height=%229%22/><text x=%228%22 y=%225%22 text-anchor=%22middle%22 fill=%22%23333%22 font-size=%222%22>🤖</text></svg>'">` : ''}
+                            ${thumbnail ? `<img class="thumbnail-desktop" src="${thumbnail}" alt="" ${isAboveFold ? 'loading="eager" fetchpriority="high"' : 'loading="lazy"'} onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 9%22><rect fill=%22%231a1a1a%22 width=%2216%22 height=%229%22/><text x=%228%22 y=%225%22 text-anchor=%22middle%22 fill=%22%23333%22 font-size=%222%22>🤖</text></svg>'">` : ''}
                             <span class="category-badge">${getCategoryEmoji(video.category)} ${video.category}</span>
                         </div>
                         <div class="video-details">

@@ -69,9 +69,13 @@ def get_videos():
         else:
             order = " ORDER BY created_at DESC"
 
-        query = f"SELECT * FROM videos {where}{order}"
-        if limit:
-            query += f" LIMIT {int(limit)}"
+        page = int(request.args.get('page', 1))
+        per_page = min(int(request.args.get('per_page', 50)), 100)
+        offset = (page - 1) * per_page
+        effective_limit = int(limit) if limit else per_page
+
+        query = f"SELECT * FROM videos {where}{order} LIMIT ? OFFSET ?"
+        params = params + [effective_limit, offset]
 
         cursor = conn.execute(query, params)
 

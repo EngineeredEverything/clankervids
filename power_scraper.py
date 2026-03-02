@@ -166,6 +166,15 @@ def insert_video(title, description, creator, category, video_url, thumbnail_url
         conn = get_conn()
         c = conn.cursor()
         vid_id = str(uuid.uuid4())
+        # Upload thumbnail to Bunny CDN for fast delivery
+        try:
+            sys.path.insert(0, '/var/www/clankervids')
+            from bunny_thumb import upload_thumbnail
+            cdn_url = upload_thumbnail(thumbnail_url, vid_id)
+            if cdn_url:
+                thumbnail_url = cdn_url
+        except Exception:
+            pass
         c.execute(
             '''INSERT INTO videos
                (id, title, description, creator, category, created_at, views,

@@ -289,13 +289,22 @@ class RedditCurator:
                 thumbnail_url = thumbnail_url.replace('&amp;', '&')
             else:
                 thumbnail_url = ''
-            
+
             category = self.categorize(title, subreddit)
-            
+
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
-            
+
             video_id = str(uuid.uuid4())
+
+            # Upload thumbnail to Bunny CDN for fast, reliable delivery
+            try:
+                from bunny_thumb import upload_thumbnail
+                cdn_url = upload_thumbnail(thumbnail_url, video_id)
+                if cdn_url:
+                    thumbnail_url = cdn_url
+            except Exception:
+                pass  # Fall back to original URL if CDN upload fails
             
             cursor.execute('''
                 INSERT INTO videos (
