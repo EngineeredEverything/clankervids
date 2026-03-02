@@ -1313,7 +1313,7 @@
                 return `
                     <div class="video-card-mobile" data-video-id="${video.id}">
                         <div class="video-wrapper-mobile">
-                            ${thumbnail ? `<img class="thumbnail-mobile" src="${thumbnail}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}
+                            <img class="thumbnail-mobile" src="${thumbnail || ''}" alt="" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 9 16%22%3E%3Crect fill=%22%231a1a1a%22 width=%229%22 height=%2216%22/%3E%3Ctext x=%224.5%22 y=%229%22 text-anchor=%22middle%22 fill=%22%23444%22 font-size=%223%22%3E🤖%3C/text%3E%3C/svg%3E'">
                             <div class="play-icon-mobile" onclick="playVideo('${video.id}', '${video.video_url}')"></div>
                             
                             <div class="video-info-mobile">
@@ -1527,7 +1527,9 @@
                 vid.loop = true;
                 slide.insertBefore(vid, slide.firstChild);
 
-                const hlsUrl = videoUrl + '/HLSPlaylist.m3u8';
+                // Extract base Reddit video URL (strip /CMAF_*.mp4?... suffix)
+                const redditBase = videoUrl.match(/https:\/\/v\.redd\.it\/[^/?]+/)?.[0] || videoUrl;
+                const hlsUrl = redditBase + '/HLSPlaylist.m3u8';
                 if (Hls.isSupported()) {
                     const hls = new Hls();
                     hls.loadSource(hlsUrl);

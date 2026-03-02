@@ -262,7 +262,10 @@ class RedditCurator:
                 # Prefer maxresdefault (1280px); fall back through lower resolutions
                 thumbnail_url = self.best_youtube_thumbnail(youtube_id)
             elif 'v.redd.it' in url:
-                video_url = url
+                # Store clean base URL (strip /CMAF_*.mp4?... suffix) for HLS playback
+                import re as _re
+                m = _re.match(r'(https://v\.redd\.it/[^/?]+)', url)
+                video_url = m.group(1) if m else url
                 # Reddit videos - use preview image if available
                 preview = post.get('preview', {})
                 images = preview.get('images', [{}])
@@ -272,7 +275,10 @@ class RedditCurator:
             elif post.get('is_video'):
                 media = post.get('media', {}) or {}
                 reddit_video = media.get('reddit_video', {})
-                video_url = reddit_video.get('fallback_url', url)
+                raw_url = reddit_video.get('fallback_url', reddit_video.get('dash_url', url))
+                import re as _re
+                m = _re.match(r'(https://v\.redd\.it/[^/?]+)', raw_url)
+                video_url = m.group(1) if m else raw_url
                 thumbnail_url = post.get('thumbnail', '')
             else:
                 # Not a video we can use
