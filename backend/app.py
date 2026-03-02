@@ -39,6 +39,8 @@ def get_videos():
 
         conn = get_db_connection()
 
+        search = request.args.get('search', '').strip()
+
         # Build query based on category
         where = "WHERE status = 'active'"
         params = []
@@ -48,6 +50,10 @@ def get_videos():
         if robot_type:
             where += " AND robot_type = ?"
             params.append(robot_type)
+        if search:
+            where += " AND (title LIKE ? OR description LIKE ? OR creator LIKE ?)"
+            like = f"%{search}%"
+            params += [like, like, like]
 
         # Add sorting
         if sort_by == 'recent':
@@ -74,6 +80,7 @@ def get_videos():
         offset = (page - 1) * per_page
         effective_limit = int(limit) if limit else per_page
 
+        filter_params = list(params)  # save before adding limit/offset
         query = f"SELECT * FROM videos {where}{order} LIMIT ? OFFSET ?"
         params = params + [effective_limit, offset]
 
@@ -110,10 +117,15 @@ def get_videos():
             }
             videos.append(video)
 
+        # Get total count before closing
+        count_query = f"SELECT COUNT(*) as c FROM videos {where}"
+        total = conn.execute(count_query, filter_params).fetchone()['c']
+
         conn.close()
 
         response = jsonify(videos)
         response.headers['Cache-Control'] = 'public, max-age=60'
+        response.headers['X-Total-Count'] = str(total)
         return response
 
     except Exception as e:

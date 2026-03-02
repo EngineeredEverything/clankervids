@@ -289,12 +289,14 @@
            ============================================ */
         @media (max-width: 899px) {
             body {
-                overflow: hidden;
+                overflow-y: auto;
             }
 
             .header {
-                background: linear-gradient(180deg, rgba(15,15,15,0.95) 0%, rgba(15,15,15,0) 100%);
-                border-bottom: none;
+                background: rgba(15,15,15,0.97);
+                border-bottom: 1px solid rgba(255,255,255,0.07);
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
             }
 
             .categories {
@@ -304,51 +306,39 @@
                 -webkit-backdrop-filter: blur(8px);
             }
 
+            /* Mobile grid replaces snap-scroll feed */
             .desktop-grid {
                 display: none !important;
             }
 
             .mobile-feed {
-                display: block;
-                height: 100vh;
-                overflow-y: scroll;
-                scroll-snap-type: y mandatory;
-                scrollbar-width: none;
-                padding-top: 106px;
-            }
-
-            .mobile-feed::-webkit-scrollbar {
-                display: none;
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+                padding: 112px 8px 72px;
             }
 
             .video-card-mobile {
-                height: calc(100vh - 106px);
-                width: 100%;
-                scroll-snap-align: start;
                 position: relative;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: black;
+                background: var(--bg-card);
+                border-radius: 10px;
+                overflow: hidden;
+                cursor: pointer;
             }
 
             .video-wrapper-mobile {
                 position: relative;
                 width: 100%;
-                height: 100%;
-                max-width: 100%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
+                padding-top: 56.25%; /* 16:9 */
+                background: #111;
             }
 
             .thumbnail-mobile {
+                position: absolute;
+                top: 0; left: 0;
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
-                position: absolute;
-                top: 0;
-                left: 0;
             }
 
             .play-icon-mobile {
@@ -356,14 +346,13 @@
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
-                width: 70px;
-                height: 70px;
-                background: rgba(0,0,0,0.6);
+                width: 36px;
+                height: 36px;
+                background: rgba(0,0,0,0.65);
                 border-radius: 50%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                cursor: pointer;
                 z-index: 5;
             }
 
@@ -372,79 +361,52 @@
                 width: 0;
                 height: 0;
                 border-style: solid;
-                border-width: 12px 0 12px 20px;
+                border-width: 7px 0 7px 12px;
                 border-color: transparent transparent transparent white;
-                margin-left: 4px;
+                margin-left: 2px;
             }
 
             .video-info-mobile {
-                position: absolute;
-                bottom: 100px;
-                left: 12px;
-                right: 70px;
-                z-index: 10;
-            }
-
-            .video-creator-mobile {
-                font-size: 15px;
-                font-weight: 600;
-                margin-bottom: 6px;
+                padding: 5px 6px 7px;
             }
 
             .video-title-mobile {
-                font-size: 13px;
-                line-height: 1.4;
+                font-size: 12px;
+                line-height: 1.3;
                 display: -webkit-box;
                 -webkit-line-clamp: 2;
                 -webkit-box-orient: vertical;
                 overflow: hidden;
-                opacity: 0.9;
+            }
+
+            .mobile-views-badge {
+                position: absolute;
+                bottom: 5px;
+                left: 5px;
+                background: rgba(0,0,0,0.75);
+                color: white;
+                font-size: 10px;
+                font-weight: 600;
+                padding: 2px 5px;
+                border-radius: 4px;
+                z-index: 4;
+            }
+
+            .mobile-cat-badge {
+                position: absolute;
+                top: 5px;
+                right: 5px;
+                font-size: 13px;
+                z-index: 4;
+                filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8));
             }
 
             .video-tags-mobile {
-                display: flex;
-                gap: 8px;
-                margin-top: 8px;
-                font-size: 12px;
-                color: var(--text-dim);
+                display: none;
             }
 
             .action-buttons-mobile {
-                position: absolute;
-                right: 8px;
-                bottom: 120px;
-                display: flex;
-                flex-direction: column;
-                gap: 16px;
-                z-index: 10;
-            }
-
-            .action-btn-mobile {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 4px;
-                cursor: pointer;
-            }
-
-            .action-icon-mobile {
-                width: 44px;
-                height: 44px;
-                background: rgba(255,255,255,0.1);
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 20px;
-            }
-
-            .action-btn-mobile.liked .action-icon-mobile {
-                background: var(--neon);
-            }
-
-            .action-count-mobile {
-                font-size: 11px;
-                color: white;
+                display: none;
             }
 
             /* Bottom Nav - Mobile Only */
@@ -632,6 +594,76 @@
             .video-stats span {
                 margin-right: 4px;
             }
+        }
+
+        /* Trending Strip */
+        .trending-strip {
+            padding: 20px 24px 0;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+        .trending-strip-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: white;
+        }
+        .video-count-badge {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-dim);
+            background: rgba(255,255,255,0.07);
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+        .trending-strip-row {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding-bottom: 4px;
+        }
+        .trending-strip-row::-webkit-scrollbar { display: none; }
+        .trending-card {
+            flex: 0 0 200px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .trending-card:hover { transform: scale(1.03); }
+        .trending-thumb {
+            position: relative;
+            width: 200px;
+            padding-top: 56.25%;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #111;
+        }
+        .trending-thumb img {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+        }
+        .trending-views {
+            position: absolute;
+            bottom: 5px; right: 5px;
+            background: rgba(0,0,0,0.8);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .trending-title {
+            font-size: 12px;
+            margin-top: 6px;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         /* Large Desktop */
@@ -1181,6 +1213,15 @@
         </div>
     </div>
 
+    <!-- Trending Hero Strip (Desktop) -->
+    <div class="trending-strip" id="trendingStrip" style="display:none">
+        <div class="trending-strip-header">
+            <span>🔥 Trending Now</span>
+            <span class="video-count-badge" id="videoCountBadge"></span>
+        </div>
+        <div class="trending-strip-row" id="trendingRow"></div>
+    </div>
+
     <!-- Desktop YouTube Grid -->
     <div class="desktop-grid" id="desktopGrid">
         <!-- Videos will be rendered here -->
@@ -1276,10 +1317,50 @@
                 if (videos.length < PER_PAGE) hasMoreVideos = false;
                 renderFeed();
                 setupLoadMoreObserver();
+                // Load trending strip + count on first load
+                if (category === 'all' && sort === 'recent') {
+                    loadTrendingStrip();
+                    loadVideoCount();
+                }
             } catch (error) {
                 console.error('Error loading videos:', error);
                 showError();
             }
+        }
+
+        async function loadTrendingStrip() {
+            if (window.innerWidth < 900) return;
+            try {
+                const res = await fetch('/api/videos?sort=popular&per_page=10');
+                const data = await res.json();
+                const top = Array.isArray(data) ? data : (data.videos || []);
+                const row = document.getElementById('trendingRow');
+                const strip = document.getElementById('trendingStrip');
+                if (!top.length) return;
+                row.innerHTML = top.map(v => {
+                    const ytId = v.youtube_id || (v.video_url?.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/)?.[1]);
+                    const thumb = v.thumbnail_url || (ytId ? `https://i.ytimg.com/vi/${ytId}/mqdefault.jpg` : '');
+                    return `<div class="trending-card" onclick="playVideo('${v.id}','${v.video_url}')">
+                        <div class="trending-thumb">
+                            ${thumb ? `<img src="${thumb}" loading="lazy" alt="">` : ''}
+                            <span class="trending-views">👁 ${formatNumber(v.views||v.view_count||0)}</span>
+                        </div>
+                        <div class="trending-title">${v.title}</div>
+                    </div>`;
+                }).join('');
+                strip.style.display = 'block';
+            } catch(e) {}
+        }
+
+        async function loadVideoCount() {
+            try {
+                const res = await fetch('/api/videos?per_page=1');
+                const total = res.headers.get('X-Total-Count');
+                if (total) {
+                    const badge = document.getElementById('videoCountBadge');
+                    if (badge) badge.textContent = `${parseInt(total).toLocaleString()} videos`;
+                }
+            } catch(e) {}
         }
 
         async function loadMoreVideos() {
@@ -1345,35 +1426,17 @@
                 const thumbnail = video.thumbnail_url || (youtubeId ? `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg` : '');
                 const isLiked = userReactions[video.id]?.clank;
                 
+                const views = video.views || video.view_count || 0;
                 return `
-                    <div class="video-card-mobile" data-video-id="${video.id}">
+                    <div class="video-card-mobile" data-video-id="${video.id}" onclick="playVideo('${video.id}', '${video.video_url}')">
                         <div class="video-wrapper-mobile">
-                            <img class="thumbnail-mobile" src="${thumbnail || ''}" alt="" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 9 16%22%3E%3Crect fill=%22%231a1a1a%22 width=%229%22 height=%2216%22/%3E%3Ctext x=%224.5%22 y=%229%22 text-anchor=%22middle%22 fill=%22%23444%22 font-size=%223%22%3E🤖%3C/text%3E%3C/svg%3E'">
-                            <div class="play-icon-mobile" onclick="playVideo('${video.id}', '${video.video_url}')"></div>
-                            
-                            <div class="video-info-mobile">
-                                <div class="video-creator-mobile">${video.creator || '@clankervids'}</div>
-                                <div class="video-title-mobile">${video.title}</div>
-                                <div class="video-tags-mobile">
-                                    <span>${getCategoryEmoji(video.category)} ${video.category}</span>
-                                    <span>👁 ${formatNumber(video.views || video.view_count || 0)}</span>
-                                </div>
-                            </div>
-
-                            <div class="action-buttons-mobile">
-                                <div class="action-btn-mobile ${isLiked ? 'liked' : ''}" onclick="react('${video.id}', 'clank')">
-                                    <div class="action-icon-mobile">🤖</div>
-                                    <span class="action-count-mobile">${formatNumber(video.clanks || video.clank_count || 0)}</span>
-                                </div>
-                                <div class="action-btn-mobile" onclick="react('${video.id}', 'fail')">
-                                    <div class="action-icon-mobile">💥</div>
-                                    <span class="action-count-mobile">${formatNumber(video.system_errors || video.fail_count || 0)}</span>
-                                </div>
-                                <div class="action-btn-mobile" onclick="shareVideo('${video.id}', '${video.title}')">
-                                    <div class="action-icon-mobile">↗️</div>
-                                    <span class="action-count-mobile">Share</span>
-                                </div>
-                            </div>
+                            <img class="thumbnail-mobile" src="${thumbnail || ''}" alt="" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 9%22%3E%3Crect fill=%22%231a1a1a%22 width=%2216%22 height=%229%22/%3E%3Ctext x=%228%22 y=%225%22 text-anchor=%22middle%22 fill=%22%23444%22 font-size=%222%22%3E🤖%3C/text%3E%3C/svg%3E'">
+                            <div class="play-icon-mobile"></div>
+                            ${views > 0 ? `<div class="mobile-views-badge">${formatNumber(views)}</div>` : ''}
+                            <div class="mobile-cat-badge">${getCategoryEmoji(video.category)}</div>
+                        </div>
+                        <div class="video-info-mobile">
+                            <div class="video-title-mobile">${video.title}</div>
                         </div>
                     </div>
                 `;
@@ -1809,18 +1872,34 @@
         });
 
         // Search (desktop)
+        // Search — hits API directly
+        let searchTimeout = null;
         document.getElementById('searchInput')?.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
-                const query = e.target.value.toLowerCase();
+                const query = e.target.value.trim();
                 if (query) {
-                    const filtered = videos.filter(v => v.title.toLowerCase().includes(query));
-                    videos = filtered.length ? filtered : videos;
-                    renderFeed();
+                    searchVideos(query);
                 } else {
                     fetchVideos(currentCategory, currentSort);
                 }
             }
         });
+        document.getElementById('searchInput')?.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            const query = e.target.value.trim();
+            if (!query) { fetchVideos(currentCategory, currentSort); return; }
+            searchTimeout = setTimeout(() => searchVideos(query), 400);
+        });
+
+        async function searchVideos(query) {
+            try {
+                const response = await fetch(`/api/videos?search=${encodeURIComponent(query)}&per_page=100`);
+                const data = await response.json();
+                videos = Array.isArray(data) ? data : (data.videos || []);
+                hasMoreVideos = false;
+                renderFeed();
+            } catch (e) { console.error('Search error:', e); }
+        }
 
         // Initialize
         fetchVideos();
