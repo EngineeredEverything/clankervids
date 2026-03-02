@@ -129,9 +129,22 @@ class RedditCurator:
             'fail', 'fails', 'falling', 'crash', 'crashed', 'oops',
             'malfunction', 'broken', 'glitch', 'shitty', 'disaster',
             'explosion', 'explode', 'breakdown', 'error', 'gone wrong',
-            'dropped', 'tipped', 'fell', 'stumble',
+            'dropped', 'tipped', 'fell', 'stumble', 'wrong', 'bad',
+            'mistake', 'accident', 'collision', 'hit a', 'clipped',
         ]
-        self.battle_keywords = ['battle', 'fight', 'vs', 'combat', 'destroy', 'battlebots']
+        self.battle_keywords = [
+            'battle', 'fight', 'vs ', ' vs ', 'versus', 'combat',
+            'destroy', 'battlebots', 'face off', 'faceoff', 'duel',
+            'championship', 'tournament', 'arena', 'compete', 'winner',
+            'spinner', 'flipper', 'crusher',
+        ]
+        self.highlight_keywords = [
+            'amazing', 'incredible', 'impressive', 'insane', 'mind-blowing',
+            'wow', 'epic', 'world record', 'first ever', 'breakthrough',
+            'revolutionary', 'unveil', 'launch', 'debut', 'new robot',
+            'humanoid', 'boston dynamics', 'unitree', 'tesla bot',
+            'showcase', 'demonstration', 'demo', 'performance',
+        ]
         
     def is_robot_content(self, title: str, subreddit: str) -> bool:
         """Check if content is robot-related"""
@@ -163,15 +176,21 @@ class RedditCurator:
         title_lower = title.lower()
         sub_lower = subreddit.lower()
 
-        # Explicit fail subs / fail keywords
+        # Fail subs / fail keywords
         if sub_lower in ('shittyrobots', 'whatcouldgowrong') or \
                 any(kw in title_lower for kw in self.fail_keywords):
             return 'fails'
         # Battle subs / battle keywords
-        elif sub_lower == 'battlebots' or \
+        elif sub_lower in ('battlebots', 'robotcombat') or \
                 any(kw in title_lower for kw in self.battle_keywords):
             return 'battles'
-        # Drone subs without fail signals → highlights
+        # Strong highlight signal
+        elif any(kw in title_lower for kw in self.highlight_keywords):
+            return 'highlights'
+        # FPV/drone footage without fail signal → highlights (it's cool footage)
+        elif sub_lower in ('fpv', 'multicopter', 'diydrones'):
+            return 'highlights'
+        # Default: highlights (safe fallback for general robotics content)
         else:
             return 'highlights'
     
@@ -217,16 +236,24 @@ class RedditCurator:
                     conn.close()
                     return True
             
-            # Check exact URL match
+            # Check exact URL match (also check clean base Reddit URL)
             cursor.execute("SELECT 1 FROM videos WHERE video_url = ?", (video_url,))
             if cursor.fetchone():
                 conn.close()
                 return True
-            
-            # Check for very similar titles (first 50 chars) to catch edge cases
+            # Also check clean base URL in case stored with/without CMAF suffix
+            import re as _re
+            m = _re.match(r'(https://v\.redd\.it/[^/?]+)', video_url)
+            if m and m.group(1) != video_url:
+                cursor.execute("SELECT 1 FROM videos WHERE video_url = ?", (m.group(1),))
+                if cursor.fetchone():
+                    conn.close()
+                    return True
+
+            # Check for very similar titles (first 60 chars) to catch reposts
             if title:
-                title_prefix = title[:50].lower().strip()
-                cursor.execute("SELECT 1 FROM videos WHERE LOWER(SUBSTR(title, 1, 50)) = ?", (title_prefix,))
+                title_prefix = title[:60].lower().strip()
+                cursor.execute("SELECT 1 FROM videos WHERE LOWER(SUBSTR(title, 1, 60)) = ?", (title_prefix,))
                 if cursor.fetchone():
                     conn.close()
                     return True
@@ -248,6 +275,30 @@ class RedditCurator:
             # Skip if not robot content
             if not self.is_robot_content(title, subreddit):
                 return False
+
+            # Quality filter: skip low-effort hobby posts
+            # FPV/drone hobby subs have a lot of "help me" posts and beginner questions
+            LOW_QUALITY_PATTERNS = [
+                r'^\[?help\]?', r'\bhelp\b.*\?$', r'^\[?question\]?',
+                r'\bpls\b', r'\bplz\b', r'anyone know', r'what is this',
+                r'noob\b', r'beginner', r'\bwtf\b',
+            ]
+            HOBBY_SUBS = {'fpv', 'multicopter', 'diydrones', 'drones'}
+            title_lower_q = title.lower().strip()
+            if subreddit.lower() in HOBBY_SUBS:
+                # Require score ≥ 50 from hobby subs (filters out personal posts)
+                if score < 50:
+                    return False
+                # Block help/question posts from hobby subs
+                if any(re.search(p, title_lower_q) for p in LOW_QUALITY_PATTERNS):
+                    return False
+                # Block titles that are clearly personal/niche (short, no viral signal)
+                HOBBY_JUNK = [
+                    'analog', 'esc ', ' esc', 'vtx', 'bind', 'betaflight',
+                    'crossfire', 'elrs', 'motors', 'props', 'lipo',
+                ]
+                if any(j in title_lower_q for j in HOBBY_JUNK) and score < 200:
+                    return False
             
             # Determine video URL and thumbnail
             youtube_id = self.extract_youtube_id(url)
